@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Hello, world!</title>
+        <script type="text/javascript" src="/eel.js"></script>
+        <script>
+            async function data_streem() {
+                let num_1 = parseFloat(document.getElementById("test").value);
+                let num_2 = parseFloat(document.getElementById("test2").value);
+                document.getElementById("p1").innerHTML = await eel.summer(num_1, num_2)();
+            };
+            document.getElementById("p1").innerHTML = "Calc";
+        </script>
+
+    </head>
+    <body>
+        <p id="data"></p>
+        <input type="text" id="test" name="email">
+        <input type="text" id="test2" name="data">
+        <input type="submit" class="btn" id="btn-sum" value="Click" onclick="data_streem()">
+        <p id="p1">Hello World!</p>
+    </body>
+</html>
