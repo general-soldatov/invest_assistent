@@ -1,0 +1,43 @@
+{
+    "actives":
+    {
+        "name": "Оценка активов, руб.",
+        "column": 10
+    },
+    "cash_flow_info": {
+        "name": "Сводная информация по движению денежных средств за период (основной рынок)",
+        "column": 3
+    },
+    "briefcase": {
+        "name": "Портфель Ценных Бумаг",
+        "column": 18
+    },
+    "cash": {
+        "name": "Денежные средства",
+        "column": 9
+    },
+    "cash_flow_period": {
+        "name": "Движение денежных средств за период",
+        "column": 6
+    },
+    "transactions": {
+        "name": "Сделки купли/продажи ценных бумаг",
+        "column": 16
+    },
+    "income_expenses": {
+        "name": "I. ДОХОДЫ И РАСХОДЫ",
+        "column": 7
+    },
+    "income_expenses_consolidate": {
+        "name": "II. ДОХОДЫ И РАСХОДЫ",
+        "column": 9
+    },
+    "fin_result": {
+        "name": "III. ИТОГОВЫЙ ФИНАНСОВЫЙ РЕЗУЛЬТАТ",
+        "column": 8
+    },
+    "securities_directory": {
+        "name": "Справочник Ценных Бумаг",
+        "column": 6
+    }
+}

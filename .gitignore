@@ -1,2 +1,6 @@
 /venv/
 .env
+/dist/
+/build/
+*.spec
+/stack_data/
