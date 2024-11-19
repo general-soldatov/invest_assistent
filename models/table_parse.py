@@ -1,16 +1,14 @@
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
-from os import getenv
 import json
 from models.report import Transactions, Enrollments, WriteDowns, SecurityDirectory
 from datetime import datetime
-load_dotenv()
-PATH = getenv('PATH')
+from typing import List
+
 
 class ParseTable:
     def __init__(self, file_path: str):
         self.data = {}
-        with open('headers.json', 'r', encoding='utf-8') as head:
+        with open('models/headers.json', 'r', encoding='utf-8') as head:
             self.headers: dict = json.load(head)
 
         with open(file_path, 'r', encoding='utf-8') as page:
@@ -41,7 +39,7 @@ class ParseTable:
                 if header.startswith(value['name']):
                     self.data[key] = self.convert_tab(table, value['column'], rule=key)
 
-    def transactions(self):
+    def transactions(self) -> List[Transactions]:
         transactions = self.data['transactions'][2:]
         result = []
         for item in transactions:
@@ -50,7 +48,7 @@ class ParseTable:
                 coupon_add_paper=float(item[10]), broker_comission=float(item[11]), market_comission=float(item[12])))
         return result
 
-    def cash_flow_period(self, papers: list):
+    def cash_flow_period(self, papers: list) -> List[Enrollments | WriteDowns]:
         enrollments = self.data['cash_flow_period'][2:]
         result = []
         name_paper = None
@@ -67,20 +65,10 @@ class ParseTable:
                         sum_enroll=float(item[4])))
         return result
 
-    def dictionary_paper(self):
+    def dictionary_paper(self) -> List[SecurityDirectory]:
         dictionary = self.data['securities_directory'][2:]
         result = []
         for item in dictionary:
             result.append(SecurityDirectory(name_paper=item[0], code_paper=item[1], isin_paper=item[2],
                         emitent=item[3], type_paper=item[4], series_paper=item[5]))
         return result
-
-
-    # with open('stack_data/data.json', 'w', encoding='utf-8') as data_set:
-    #     json.dump(data, data_set, ensure_ascii=False, indent=4)
-
-parse = ParseTable(file_path=PATH)
-parse.parsing()
-
-for item in parse.dictionary_paper():#cash_flow_period(['Магнит4P03', 'ФЭСАгро1Р1']):
-    print(item.__dict__)

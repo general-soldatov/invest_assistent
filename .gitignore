@@ -4,3 +4,4 @@
 /build/
 *.spec
 /stack_data/
+my-database.db
