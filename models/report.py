@@ -1,6 +1,7 @@
 # from pydantic import BaseModel
 from datetime import date
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import BigInteger
 
 class Base(DeclarativeBase):
     pass
@@ -22,18 +23,26 @@ class Transactions(Base):
 class Enrollments(Base):
     __tablename__ = 'enrollments'
 
-    id_: Mapped[int] = mapped_column(primary_key=True, autoincrement = "auto")
+    id_hash: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name_paper: Mapped[str] = mapped_column()
+    date_operation: Mapped[date] = mapped_column()
+    sum_enroll: Mapped[float] = mapped_column()
+
+class MyCash(Base):
+    __tablename__ = 'my-cash'
+
+    id_hash: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    operation: Mapped[str] = mapped_column()
     date_operation: Mapped[date] = mapped_column()
     sum_enroll: Mapped[float] = mapped_column()
 
 class WriteDowns(Base):
     __tablename__ = 'write-downs'
 
-    id_: Mapped[int] = mapped_column(primary_key=True, autoincrement = "auto")
-    name_paper: Mapped[str] = mapped_column()
+    id_hash: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    operation: Mapped[str] = mapped_column()
     date_operation: Mapped[date] = mapped_column()
-    sum_down: Mapped[float] = mapped_column()
+    sum_enroll: Mapped[float] = mapped_column()
 
 class SecurityDirectory(Base):
     __tablename__ = 'security-directory'
@@ -44,3 +53,10 @@ class SecurityDirectory(Base):
     emitent: Mapped[str] = mapped_column()
     type_paper: Mapped[str] = mapped_column()
     series_paper: Mapped[str] = mapped_column()
+
+class NominalPaper(Base):
+    __tablename__ = 'nominal_paper'
+
+    name_paper: Mapped[str] = mapped_column(primary_key=True)
+    nominal: Mapped[float] = mapped_column()
+    paper_count: Mapped[int] = mapped_column()

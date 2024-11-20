@@ -1,9 +1,8 @@
 from bs4 import BeautifulSoup
 import json
-from models.report import Transactions, Enrollments, WriteDowns, SecurityDirectory
+from models.report import Transactions, Enrollments, WriteDowns, SecurityDirectory, MyCash, NominalPaper
 from datetime import datetime
 from typing import List
-
 
 class ParseTable:
     def __init__(self, file_path: str):
@@ -32,6 +31,14 @@ class ParseTable:
     def get_header(table: BeautifulSoup):
         return table.previous_sibling.previous_sibling.text.strip().replace('\n', '')
 
+    @staticmethod
+    def hash_key(*args, table_size=10**13, prime=7):
+        hash_str = ''.join(map(str, args))
+        hash_value = 0
+        for i, char in enumerate(hash_str, 1):
+            hash_value += ord(char) * (prime ** i)
+        return hash_value % table_size
+
     def parsing(self):
         for table in self.tables:
             header = self.get_header(table)
@@ -44,8 +51,8 @@ class ParseTable:
         result = []
         for item in transactions:
             result.append(Transactions(id_deal=int(item[13]), name_paper=item[3],
-                date_deal=datetime.strptime(item[0], '%d.%m.%Y'), type_deal=item[6], count_paper=int(item[7]), price_paper=float(item[8]),
-                coupon_add_paper=float(item[10]), broker_comission=float(item[11]), market_comission=float(item[12])))
+                date_deal=datetime.strptime(item[0], '%d.%m.%Y'), type_deal=item[6], count_paper=int(item[7].replace(' ', '')), price_paper=float(item[8].replace(' ', '')),
+                coupon_add_paper=float(item[10].replace(' ', '')), broker_comission=float(item[11].replace(' ', '')), market_comission=float(item[12].replace(' ', ''))))
         return result
 
     def cash_flow_period(self, papers: list) -> List[Enrollments | WriteDowns]:
@@ -57,12 +64,18 @@ class ParseTable:
                 if paper in item[2]:
                     name_paper = paper
                     break
+            hash_str = self.hash_key(item[4], item[5], item[0], item[2])
+            if not name_paper and "Зачисление" in item[2]:
+                result.append(MyCash(id_hash=hash_str, operation=item[2], date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
+                        sum_enroll=float(item[4].replace(' ', ''))))
+                continue
+
             if item[4] != "0.00":
-                result.append(Enrollments(name_paper=name_paper, date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
-                        sum_enroll=float(item[4])))
+                result.append(Enrollments(id_hash=hash_str, name_paper=name_paper, date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
+                        sum_enroll=float(item[4].replace(' ', ''))))
             else:
-                result.append(WriteDowns(name_paper=name_paper, date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
-                        sum_enroll=float(item[4])))
+                result.append(WriteDowns(id_hash=hash_str, operation=item[2], date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
+                        sum_enroll=float(item[5].replace(' ', ''))))
         return result
 
     def dictionary_paper(self) -> List[SecurityDirectory]:
@@ -71,4 +84,12 @@ class ParseTable:
         for item in dictionary:
             result.append(SecurityDirectory(name_paper=item[0], code_paper=item[1], isin_paper=item[2],
                         emitent=item[3], type_paper=item[4], series_paper=item[5]))
+        return result
+
+    def nominal_paper(self) -> List[NominalPaper]:
+        nominal = self.data['briefcase'][2:-1]
+        result = []
+        for item in nominal:
+            result.append(NominalPaper(name_paper=item[0], nominal=float(item[4].replace(' ', '')),
+                paper_count=int(item[8].replace(" ", ""))))
         return result

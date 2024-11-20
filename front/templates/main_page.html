@@ -22,5 +22,18 @@
         <p id="p1">Hello World!</p>
         {% endfor %}
         <h1></h1>
+        <input type="text" id="js_text" name="data">
+        <input type="submit" class="btn" id="js_btn" value="Click">
+        <p id="par_block">Hello</p>
+        <script>
+            function handleClick() {
+                alert('Button is clicked!');
+                const text_input = document.getElementById('js_text');
+                const block = document.getElementById('par_block');
+                block.innerHTML = text_input.value
+            }
+            const button = document.getElementById('js_btn');
+            button.addEventListener('click', handleClick)
+        </script>
     </body>
 </html>
