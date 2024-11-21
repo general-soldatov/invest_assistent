@@ -26,6 +26,7 @@
         <input type="submit" class="btn" id="js_btn" value="Click">
         <p id="par_block">Hello</p>
         <script>
+            /// Добавление кнопки функции изменения текста элемента
             function handleClick() {
                 alert('Button is clicked!');
                 const text_input = document.getElementById('js_text');
@@ -34,6 +35,18 @@
             }
             const button = document.getElementById('js_btn');
             button.addEventListener('click', handleClick)
+            // Создание нового элемента и помещение его в конец тела файла
+            let newElement = document.createElement("div");
+            newElement.textContent = "Новый элемент";
+            document.body.appendChild(newElement);
+            let newParagraph = document.createElement("p");
+            newParagraph.textContent = "This is paragraph";
+            document.body.appendChild(newParagraph);
+            newParagraph.setAttribute("href", "https://example.com");
+            newElement.style.color = "red"
+            newElement.addEventListener("click", function() {
+                    alert("Элемент кликнут");
+            });
         </script>
     </body>
 </html>

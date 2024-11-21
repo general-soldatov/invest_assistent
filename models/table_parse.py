@@ -3,6 +3,9 @@ import json
 from models.report import Transactions, Enrollments, WriteDowns, SecurityDirectory, MyCash, NominalPaper
 from datetime import datetime
 from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
 
 class ParseTable:
     def __init__(self, file_path: str):
@@ -11,8 +14,12 @@ class ParseTable:
             self.headers: dict = json.load(head)
 
         with open(file_path, 'r', encoding='utf-8') as page:
-            soup = BeautifulSoup(page.read(), "html.parser")
-            self.tables = soup.findAll('table')
+            try:
+                soup = BeautifulSoup(page.read(), "html.parser")
+                self.tables = soup.findAll('table')
+            except UnicodeDecodeError:
+                logger.error(file_path)
+
 
     @staticmethod
     def convert_tab(tab: BeautifulSoup, column, rule = None):
@@ -58,24 +65,36 @@ class ParseTable:
     def cash_flow_period(self, papers: list) -> List[Enrollments | WriteDowns]:
         enrollments = self.data['cash_flow_period'][2:]
         result = []
-        name_paper = None
         for item in enrollments:
+            name_paper = None
             for paper in papers:
                 if paper in item[2]:
                     name_paper = paper
                     break
-            hash_str = self.hash_key(item[4], item[5], item[0], item[2])
-            if not name_paper and "Зачисление" in item[2]:
-                result.append(MyCash(id_hash=hash_str, operation=item[2], date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
-                        sum_enroll=float(item[4].replace(' ', ''))))
+            try:
+                hash_str = self.hash_key(item[4], item[5], item[0], item[2])
+                if not name_paper and "Зачисление" in item[2]:
+                    result.append(MyCash(id_hash=hash_str, operation=item[2], date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
+                            sum_enroll=float(item[4].replace(' ', ''))))
+                    continue
+                type_oper = None
+                for oper in ['купон', 'амортизация', 'погашение', 'дивиденды']:
+                    if oper in item[2].lower():
+                        type_oper = oper
+                        break
+                if not type_oper:
+                    type_oper = item[2]
+
+                if item[4] != "0.00" and name_paper:
+                    result.append(Enrollments(id_hash=hash_str, name_paper=name_paper, type_operation = type_oper, date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
+                            sum_enroll=float(item[4].replace(' ', ''))))
+                elif item[5] != "0.00":
+                    result.append(WriteDowns(id_hash=hash_str, operation=item[2], date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
+                            sum_enroll=float(item[5].replace(' ', ''))))
+            except ValueError:
+                logger.error('Value Error')
                 continue
 
-            if item[4] != "0.00":
-                result.append(Enrollments(id_hash=hash_str, name_paper=name_paper, date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
-                        sum_enroll=float(item[4].replace(' ', ''))))
-            else:
-                result.append(WriteDowns(id_hash=hash_str, operation=item[2], date_operation=datetime.strptime(item[0], '%d.%m.%Y'),
-                        sum_enroll=float(item[5].replace(' ', ''))))
         return result
 
     def dictionary_paper(self) -> List[SecurityDirectory]:

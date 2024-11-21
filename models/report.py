@@ -24,6 +24,7 @@ class Enrollments(Base):
     __tablename__ = 'enrollments'
 
     id_hash: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    type_operation: Mapped[str] = mapped_column()
     name_paper: Mapped[str] = mapped_column()
     date_operation: Mapped[date] = mapped_column()
     sum_enroll: Mapped[float] = mapped_column()

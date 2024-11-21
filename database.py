@@ -26,7 +26,7 @@ class DBManager:
                     condition = SecurityDirectory.name_paper == item.name_paper
                     query = select(SecurityDirectory).where(condition)
                     data: SecurityDirectory = session.scalars(query).one()
-                    logger.error(f'{data.name_paper} is present with dictionary')
+                    # logger.error(f'{data.name_paper} is present with dictionary')
                 except NoResultFound:
                     session.add(item)
                     continue
@@ -34,12 +34,17 @@ class DBManager:
 
     def add_transactions(self):
         with self.Session() as session:
-            for item in self.parse.transactions():
+            try:
+                transactions = self.parse.transactions()
+            except KeyError:
+                logger.error('Transactions is not implemented.')
+                return
+            for item in transactions:
                 try:
                     condition = Transactions.id_deal == item.id_deal
                     query = select(Transactions).where(condition)
                     data: Transactions = session.scalars(query).one()
-                    logger.error(f'{data.id_deal} is present with transactions')
+                    # logger.error(f'{data.id_deal} is present with transactions')
                 except NoResultFound:
                     session.add(item)
                     continue
@@ -60,22 +65,27 @@ class DBManager:
 
     def add_cash_flow(self):
         with self.Session() as session:
-            query = select(SecurityDirectory.name_paper)
-            papers = session.scalars(query).all()
-            for item in self.parse.cash_flow_period(papers):
-                try:
-                    table = MyCash
-                    condition = table.id_hash == item.id_hash
-                    if isinstance(item, Enrollments):
-                        table = Enrollments
-                    elif isinstance(item, WriteDowns):
-                        table = WriteDowns
-                    query = select(table).where(condition)
-                    data: WriteDowns = session.scalars(query).one()
-                    logger.error(f'{data.id_hash} is present with cash-flow data.')
-                except NoResultFound:
-                    session.merge(item)
-                    continue
+            try:
+                query = select(SecurityDirectory.name_paper)
+                papers = session.scalars(query).all()
+                data = self.parse.cash_flow_period(papers)
+            except KeyError:
+                logger.error('cash_flow_period is not with data')
+                return
+            for item in data:
+                # try:
+                #     table = MyCash
+                #     condition = table.id_hash == item.id_hash
+                #     if isinstance(item, Enrollments):
+                #         table = Enrollments
+                #     elif isinstance(item, WriteDowns):
+                #         table = WriteDowns
+                #     query = select(table).where(condition)
+                #     data: WriteDowns = session.scalars(query).one()
+                #     logger.error(f'{data.id_hash} is present with cash-flow data.')
+                # except NoResultFound:
+                session.merge(item)
+                continue
             session.commit()
 
 
