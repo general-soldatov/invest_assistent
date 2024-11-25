@@ -6,6 +6,21 @@ from database import DBManager, Base, Transactions, SecurityDirectory, Enrollmen
 from typing import List
 # from models.table_parse import ParseTable
 
+
+class MainPage:
+    def __init__(self):
+        engine = create_engine('sqlite:///my-database.db')
+        self.Session: sessionmaker = sessionmaker(engine)
+
+    def enrollments(self, types='купон'):
+        query = select(Enrollments).where(Enrollments.type_operation == types)
+        data: Enrollments = self.Session().scalars(query).all()
+        result = []
+        for item in data:
+            item.date_operation = item.date_operation.strftime("%d.%m.%Y")
+            result.append(item.__dict__)
+        return result
+
 def add_data(Session: sessionmaker):
     mypath = 'stack_data'
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f != 'data.json']
@@ -25,6 +40,8 @@ def query(Session: sessionmaker):
         # result += item.price_paper * item.count_paper * 10
         print(item.__dict__)
     print(result)
+
+
 
 def transactions(Session: sessionmaker, type_deal = 'Покупка'):
     query = select(Transactions.name_paper, Transactions.price_paper,
@@ -82,12 +99,11 @@ def main():
     # Base.metadata.create_all(engine)
     # add_data(Session)
     # query(Session)
-    cash = my_cash(Session) + enrollment(Session) - \
-        my_write_down(Session) + enrollment(Session, oper='погашение') - \
-        transactions(Session) + transactions(Session, 'Продажа') + enrollment(Session, oper='амортизация')
-    print(cash)
-    #
-    #
+    # cash = my_cash(Session) + enrollment(Session) - \
+    #     my_write_down(Session) + enrollment(Session, oper='погашение') - \
+    #     transactions(Session) + transactions(Session, 'Продажа') + enrollment(Session, oper='амортизация')
+    # print(cash)
+    print(MainPage().enrollments()[0])
 
 
 if __name__ == '__main__':

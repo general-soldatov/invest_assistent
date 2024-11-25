@@ -1,4 +1,5 @@
 import eel
+from mail_parse import MainPage
 # from jinja2 import Environment, PackageLoader, select_autoescape, Template
 
 # env = Environment(
@@ -15,6 +16,17 @@ eel.init('front')
 @eel.expose
 def summer(x, y):
     return x + y
+
+@eel.expose
+def coupons():
+    data = MainPage().enrollments()
+    return data
+
+# @eel.expose
+# def coupons():
+#     data = MainPage().enrollments()
+#     return data
+
 
 
 eel.start('templates/main_page.html', jinja_templates='templates')

@@ -1,8 +1,68 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Hello, world!</title>
+        <title>GS: Invest Assistant</title>
         <script type="text/javascript" src="/eel.js"></script>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+        <div class="topnav"></div><br>
+        <div id="wrapper">
+          <div id="menu"></div>
+          <div id="content"></div>
+        </div>
+
+        <script>
+          function addHeader() {
+          header = {
+            "Главная": "#home",
+            "Дашборд": "#dashboard",
+            "Календарь": "#calendar",
+            "Меню": "#menu",
+            "Настройки": "#set"
+          };
+          const divHeader = document.getElementsByClassName("topnav")[0];
+          for (key in header) {
+            let newElement = document.createElement("a");
+            newElement.textContent = key;
+            if (key == "Главная") {
+              newElement.classList.add("active");
+            };
+            newElement.href = header[key]
+            divHeader.appendChild(newElement);
+          };
+        };
+        addHeader();
+        </script>
+        <script type="text/javascript" src="/scripts/page.js"></script>
+        <script>
+            function getMenu() {
+                const menu = {'Coupons': async function() {
+                    data = await eel.coupons()();
+                    getEnrollments(data);
+                },
+                                'Enrollments': enrollments,
+                                'Transactions': transactions};
+                const vision = document.getElementById("menu");
+                for (const key in menu) {
+                    const elem = document.createElement("a");
+                    elem.innerHTML = `${key}<br>`;
+                    elem.href = `#${key}`;
+                    elem.addEventListener("click", menu[key]);
+                    vision.appendChild(elem);
+                };
+                };
+
+            getMenu()
+        </script>
+        <p id="data"></p>
+        <input type="text" id="test" name="email">
+        <input type="text" id="test2" name="data">
+        <input type="submit" class="btn" id="btn-sum" value="Click" onclick="data_stream()">
+        <h1></h1>
+        <input type="text" id="js_text" name="data">
+        <input type="submit" class="btn" id="js_btn" value="Click">
+        <p id="par_block">Hello</p>
         <script>
             async function data_stream() {
                 let num_1 = parseFloat(document.getElementById("test").value);
@@ -10,43 +70,6 @@
                 document.getElementById("p1").innerHTML = await eel.summer(num_1, num_2)();
             };
             document.getElementById("p1").innerHTML = "Calc";
-        </script>
-
-    </head>
-    <body>
-        <p id="data"></p>
-        <input type="text" id="test" name="email">
-        <input type="text" id="test2" name="data">
-        <input type="submit" class="btn" id="btn-sum" value="Click" onclick="data_stream()">
-        {% for item in range(5) %}
-        <p id="p1">Hello World!</p>
-        {% endfor %}
-        <h1></h1>
-        <input type="text" id="js_text" name="data">
-        <input type="submit" class="btn" id="js_btn" value="Click">
-        <p id="par_block">Hello</p>
-        <script>
-            /// Добавление кнопки функции изменения текста элемента
-            function handleClick() {
-                alert('Button is clicked!');
-                const text_input = document.getElementById('js_text');
-                const block = document.getElementById('par_block');
-                block.innerHTML = text_input.value
-            }
-            const button = document.getElementById('js_btn');
-            button.addEventListener('click', handleClick)
-            // Создание нового элемента и помещение его в конец тела файла
-            let newElement = document.createElement("div");
-            newElement.textContent = "Новый элемент";
-            document.body.appendChild(newElement);
-            let newParagraph = document.createElement("p");
-            newParagraph.textContent = "This is paragraph";
-            document.body.appendChild(newParagraph);
-            newParagraph.setAttribute("href", "https://example.com");
-            newElement.style.color = "red"
-            newElement.addEventListener("click", function() {
-                    alert("Элемент кликнут");
-            });
         </script>
     </body>
 </html>
