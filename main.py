@@ -18,14 +18,14 @@ def summer(x, y):
     return x + y
 
 @eel.expose
-def coupons():
-    data = MainPage().enrollments()
-    return data
+def coupons(enrollments=None):
+    data, cash = MainPage().enrollments(enrollments)
+    return data, cash
 
-# @eel.expose
-# def coupons():
-#     data = MainPage().enrollments()
-#     return data
+@eel.expose
+def transactions(types = 'Покупка'):
+    data, cash = MainPage().transactions(types)
+    return data, cash
 
 
 

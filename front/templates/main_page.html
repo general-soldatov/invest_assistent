@@ -16,7 +16,7 @@
           function addHeader() {
           header = {
             "Главная": "#home",
-            "Дашборд": "#dashboard",
+            "Отчёты": "#reports",
             "Календарь": "#calendar",
             "Меню": "#menu",
             "Настройки": "#set"
@@ -25,7 +25,7 @@
           for (key in header) {
             let newElement = document.createElement("a");
             newElement.textContent = key;
-            if (key == "Главная") {
+            if (key == "Отчёты") {
               newElement.classList.add("active");
             };
             newElement.href = header[key]
@@ -35,26 +35,6 @@
         addHeader();
         </script>
         <script type="text/javascript" src="/scripts/page.js"></script>
-        <script>
-            function getMenu() {
-                const menu = {'Coupons': async function() {
-                    data = await eel.coupons()();
-                    getEnrollments(data);
-                },
-                                'Enrollments': enrollments,
-                                'Transactions': transactions};
-                const vision = document.getElementById("menu");
-                for (const key in menu) {
-                    const elem = document.createElement("a");
-                    elem.innerHTML = `${key}<br>`;
-                    elem.href = `#${key}`;
-                    elem.addEventListener("click", menu[key]);
-                    vision.appendChild(elem);
-                };
-                };
-
-            getMenu()
-        </script>
         <p id="data"></p>
         <input type="text" id="test" name="email">
         <input type="text" id="test2" name="data">

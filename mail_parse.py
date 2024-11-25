@@ -2,7 +2,7 @@ from os import listdir
 from os.path import isfile, join
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
-from database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns
+from database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns, NominalPaper
 from typing import List
 # from models.table_parse import ParseTable
 
@@ -12,14 +12,36 @@ class MainPage:
         engine = create_engine('sqlite:///my-database.db')
         self.Session: sessionmaker = sessionmaker(engine)
 
-    def enrollments(self, types='купон'):
-        query = select(Enrollments).where(Enrollments.type_operation == types)
+    def enrollments(self, types):
+        condition = Enrollments.type_operation == types if types else Enrollments.type_operation != 'купон'
+        query = select(Enrollments).where(condition).order_by(Enrollments.date_operation)
         data: Enrollments = self.Session().scalars(query).all()
         result = []
+        cash = 0
         for item in data:
             item.date_operation = item.date_operation.strftime("%d.%m.%Y")
             result.append(item.__dict__)
-        return result
+            cash += item.sum_enroll
+        return result, round(cash, 2)
+
+    def transactions(self, types='Покупка'):
+        # query = select(Transactions).
+        data: Transactions = self.Session().query(Transactions, NominalPaper, SecurityDirectory).\
+            join(NominalPaper, Transactions.name_paper == NominalPaper.name_paper).\
+                join(SecurityDirectory, Transactions.name_paper == SecurityDirectory.name_paper).\
+                    where(Transactions.type_deal == types).all()
+        result = []
+        cash = 0
+        for cash_flow, nominal, sec in data:
+            cash_flow.date_deal = cash_flow.date_deal.strftime("%d.%m.%Y")
+            cash_flow.nominal = nominal.nominal
+            cash_flow.type = sec.type_paper
+            cash_flow.sum = round(cash_flow.price_paper * cash_flow.count_paper, 2)
+            if 'Облигация' in cash_flow.type:
+                cash_flow.sum = round(cash_flow.sum * nominal.nominal / 100, 2)
+            result.append(cash_flow.__dict__)
+            cash += cash_flow.sum
+        return result, round(cash, 2)
 
 def add_data(Session: sessionmaker):
     mypath = 'stack_data'
@@ -103,7 +125,8 @@ def main():
     #     my_write_down(Session) + enrollment(Session, oper='погашение') - \
     #     transactions(Session) + transactions(Session, 'Продажа') + enrollment(Session, oper='амортизация')
     # print(cash)
-    print(MainPage().enrollments()[0])
+    data, cash = MainPage().transactions()
+    print(data[5])
 
 
 if __name__ == '__main__':

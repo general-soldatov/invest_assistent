@@ -1,5 +1,17 @@
-function getEnrollments(data=[]) {
-    const head = {'Date': 15, 'Operation': 20, 'Name Paper': 45, 'Sum': 20};
+const dataJSON = {
+  "coupons": {
+      "head": {"Date": 15, "Operation": 20, "Name Paper": 45, "Sum": 20},
+      "keys": ["date_operation", "type_operation", "name_paper",  "sum_enroll"]
+  },
+  "transactions": {
+      "head": {"Date": 15, "Name Paper": 25, "type_deal": 10, "Price Paper": 20, "Count Paper": 10, "Sum": 20},
+      "keys": ["date_deal", "name_paper", "type_deal", "price_paper",  "count_paper", "sum"]
+  }
+};
+
+function getEnrollments(dataDB=[], cash=0, tableName = 'coupons') {
+    const head = dataJSON[tableName].head;
+    const keys = dataJSON[tableName].keys;
     const vision = document.getElementById("content");
     vision.innerHTML = '';
     let table = document.createElement("table");
@@ -13,8 +25,7 @@ function getEnrollments(data=[]) {
       th.style = `width: ${head[key]}%`;
       tr.appendChild(th);
     };
-    const keys = ['date_operation', 'type_operation', 'name_paper',  'sum_enroll'];
-    for (item of data) {
+    for (item of dataDB) {
       let tr_cikle = document.createElement("tr");
       table.appendChild(tr_cikle);
       for (const key of keys) {
@@ -23,40 +34,37 @@ function getEnrollments(data=[]) {
         tr_cikle.appendChild(td);
       };
     };
+    let cash_tr = document.createElement("tr");
+    cash_tr.innerHTML = `${"<th></th>".repeat(keys.length - 2)}<th>Summary</th><th>${cash}</th>`;
+    table.appendChild(cash_tr);
 };
 
-function coupons() {
-  const data = [{
-      'Date': '12/33/22',
-      'Operation': 'Sale',
-      'Name Paper': 'OFS',
-      'Sum': 332
-    },
-    {
-      'Date': '12/33/22',
-      'Operation': 'Sale',
-      'Name Paper': 'OFS-7',
-      'Sum': 335
-    },];
-    getEnrollments(data);
-};
+function getMenu() {
+  const menu = {
+                  'Купоны': async function() {
+                    data_coupon = await eel.coupons("купон")();
+                    getEnrollments(data_coupon[0], data_coupon[1]);
+                },
+                  'Иные доходы': async function() {
+                    data_coupon = await eel.coupons()();
+                    getEnrollments(data_coupon[0], data_coupon[1]);
+                },
+                  'Покупки': async function() {
+                    data_coupon = await eel.transactions('Покупка')();
+                    getEnrollments(data_coupon[0], data_coupon[1], tableName="transactions");
+                },
+                  'Продажи': async function() {
+                    data_coupon = await eel.transactions('Продажа')();
+                    getEnrollments(data_coupon[0], data_coupon[1], tableName="transactions");
+                }};
+  const vision = document.getElementById("menu");
+  for (const key in menu) {
+      const elem = document.createElement("a");
+      elem.innerHTML = `${key}<br>`;
+      elem.href = `#${key}`;
+      elem.addEventListener("click", menu[key]);
+      vision.appendChild(elem);
+  };
+  };
 
-function enrollments() {
-  const data = [{
-      'Date': '12/33/22',
-      'Operation': 'Sale',
-      'Name Paper': 'OFS',
-      'Sum': 332
-    }];
-    getEnrollments(data);
-};
-
-function transactions() {
-  const data = [{
-      'Date': '12/13/21',
-      'Operation': 'Market',
-      'Name Paper': 'RSHB',
-      'Sum': 312
-    }];
-    getEnrollments(data);
-};
+getMenu()
