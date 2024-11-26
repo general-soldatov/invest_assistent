@@ -2,7 +2,7 @@ from os import listdir
 from os.path import isfile, join
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
-from database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns, NominalPaper
+from database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns, NominalPaper, BondInfo
 from typing import List, Dict
 from moex_parser import InfoPaper
 # from models.table_parse import ParseTable
@@ -26,7 +26,6 @@ class MainPage:
         return result, round(cash, 2)
 
     def transactions(self, types='Покупка'):
-        # query = select(Transactions).
         data: Transactions = self.Session().query(Transactions, NominalPaper, SecurityDirectory).\
             join(NominalPaper, Transactions.name_paper == NominalPaper.name_paper).\
                 join(SecurityDirectory, Transactions.name_paper == SecurityDirectory.name_paper).\
@@ -82,6 +81,27 @@ class MainPage:
 
         return dict_paper
 
+    def get_bonds_sql(self):
+        data = self.Session().scalars(select(BondInfo)).all()
+        return [item.__dict__ for item in data]
+
+    def get_briefcase(self):
+        data = self.Session().query(BondInfo.name_paper, BondInfo.security_id).all()
+        papers = self.get_count_paper()
+        result = []
+        for item in data:
+            name = item[0]
+            if 'ОФЗ ' in name:
+                name = name[4:]
+            try:
+                dct = {**papers[name], 'name_paper': name}
+            except KeyError:
+                continue
+            dct['price'] = InfoPaper().get_price_paper(item[1])
+            if dct['count'] < 0:
+                dct['count'] = 0
+            result.append(dct)
+        return result
 
 
 
@@ -167,8 +187,14 @@ def main():
     #     my_write_down(Session) + enrollment(Session, oper='погашение') - \
     #     transactions(Session) + transactions(Session, 'Продажа') + enrollment(Session, oper='амортизация')
     # print(cash)
-    data = MainPage().get_coupons()
-    print(data)
+    # data = MainPage().get_bonds()
+    # data = MainPage().get_bonds_sql()
+    # print(InfoPaper().get_price_paper(['RU000A1058K7']))
+    data = MainPage().get_briefcase()
+    [print(item) for item in data]
+    # data = [{'security_id': 'SU26243RMFS4', 'name_paper': 'ОФЗ 26243', 'nominal': 1000, 'coupon_value': 48.87, 'nkd': 46.99, 'next_coupon_date': '2024-12-04', 'maturity_date': '2038-05-19', 'coupon_period': 182, 'coupon_enroll': '9.774 %'}]
+    # DBManager(Session, file_path='stack_data/400PJLR_010121_310121_M.html').add_bond_info(data)
+    # print(data)
 
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ const dataJSON = {
   },
   "bonds": {
       "head": {"Облигация": 20, "Номинал": 10, "Купон": 10, "НКД": 10, "Следующая выплата": 15, "Дата погашения": 15, "Периодичность выплат": 10, "Купонная доходность": 10},
-      "keys": ["short_name", "nominal", "coupon_value", "nkd",  "next_coupon_date", "maturity_date", "coupon_period", "coupon_enroll"]
+      "keys": ["name_paper", "nominal", "coupon_value", "nkd",  "next_coupon_date", "maturity_date", "coupon_period", "coupon_enroll"]
   }
 };
 
@@ -50,9 +50,12 @@ function getEnrollments(dataDB=[], cash=0, tableName = 'coupons') {
         tr_cikle.appendChild(td);
       };
     };
-    let cash_tr = document.createElement("tr");
-    cash_tr.innerHTML = `${"<th></th>".repeat(keys.length - 2)}<th>Summary</th><th>${cash}</th>`;
-    table.appendChild(cash_tr);
+    if (cash != 0) {
+      let cash_tr = document.createElement("tr");
+      cash_tr.innerHTML = `${"<th></th>".repeat(keys.length - 2)}<th>Summary</th><th>${cash}</th>`;
+      table.appendChild(cash_tr);
+    }
+
 };
 
 function getMenu() {

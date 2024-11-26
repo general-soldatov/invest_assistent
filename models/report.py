@@ -61,3 +61,16 @@ class NominalPaper(Base):
     name_paper: Mapped[str] = mapped_column(primary_key=True)
     nominal: Mapped[float] = mapped_column()
     paper_count: Mapped[int] = mapped_column()
+
+class BondInfo(Base):
+    __tablename__ = 'bond_info_moex'
+
+    name_paper: Mapped[str] = mapped_column(primary_key=True)
+    security_id: Mapped[str] = mapped_column()
+    nominal: Mapped[int] = mapped_column()
+    coupon_value: Mapped[float] = mapped_column()
+    nkd: Mapped[float] = mapped_column()
+    next_coupon_date: Mapped[str] = mapped_column()
+    maturity_date: Mapped[str] = mapped_column()
+    coupon_period: Mapped[int] = mapped_column()
+    coupon_enroll: Mapped[str] = mapped_column()

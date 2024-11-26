@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 from sqlalchemy.exc import NoResultFound, IntegrityError
 import sqlite3
 
-from models.report import Base, Transactions, SecurityDirectory, Enrollments, WriteDowns, MyCash, NominalPaper
+from models.report import Base, Transactions, SecurityDirectory, Enrollments, WriteDowns, MyCash, NominalPaper, BondInfo
 from models.table_parse import ParseTable
 from typing import List
 from dotenv import load_dotenv
@@ -73,19 +73,15 @@ class DBManager:
                 logger.error('cash_flow_period is not with data')
                 return
             for item in data:
-                # try:
-                #     table = MyCash
-                #     condition = table.id_hash == item.id_hash
-                #     if isinstance(item, Enrollments):
-                #         table = Enrollments
-                #     elif isinstance(item, WriteDowns):
-                #         table = WriteDowns
-                #     query = select(table).where(condition)
-                #     data: WriteDowns = session.scalars(query).one()
-                #     logger.error(f'{data.id_hash} is present with cash-flow data.')
-                # except NoResultFound:
                 session.merge(item)
                 continue
+            session.commit()
+
+    def add_bond_info(self, data: List[dict]):
+        with self.Session() as session:
+            for item in data:
+                session.merge(BondInfo(**item))
+
             session.commit()
 
 

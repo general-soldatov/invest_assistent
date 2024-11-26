@@ -30,7 +30,7 @@ def transactions(types = 'Покупка'):
 
 @eel.expose
 def moex_data():
-    lst = MainPage().get_bonds()
+    lst = MainPage().get_bonds_sql()
     return lst
 
 

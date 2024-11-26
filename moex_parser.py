@@ -4,40 +4,46 @@ from typing import List
 
 class InfoPaper:
     def __init__(self):
-        url = 'https://iss.moex.com/iss/engines/stock/markets/bonds/securities.xml'
+        self.url_bond_seq = 'https://iss.moex.com/iss/engines/stock/markets/bonds/securities.xml'
+        self.price_url = lambda x: f'https://iss.moex.com/iss/engines/stock/markets/bonds/securities.xml?securities={x}'
+
+    @staticmethod
+    def response_soup(url) -> BeautifulSoup:
         response = requests.get(url)
-        soup = BeautifulSoup(response.content, 'xml')
-        self.bonds = soup.find_all('row')
+        return BeautifulSoup(response.content, 'xml')
+
 
     def get_bond(self, isin: str):
-        for bond in self.bonds:
+        bonds = self.response_soup(self.url_bond_seq).find_all('row')
+        for bond in bonds:
             if bond['ISIN'] == isin:
                 return {
                     'security_id': bond['SECID'],
-                    'short_name': bond['SHORTNAME'],
-                    'nominal': bond['LOTVALUE'],
-                    'coupon_value': bond['COUPONVALUE'],
-                    'nkd': bond['ACCRUEDINT'],
+                    'name_paper': bond['SHORTNAME'],
+                    'nominal': int(bond['LOTVALUE']),
+                    'coupon_value': float(bond['COUPONVALUE']),
+                    'nkd': float(bond['ACCRUEDINT']),
                     'next_coupon_date': bond['NEXTCOUPON'],
                     'maturity_date': bond['MATDATE'],
-                    'coupon_period': bond['COUPONPERIOD']
+                    'coupon_period': int(bond['COUPONPERIOD'])
                 }
 
     def get_bonds_lst(self, bonds_isin: List[str]):
+        bonds = self.response_soup(self.url_bond_seq).find_all('row')
         data = []
-        for bond in self.bonds:
+        for bond in bonds:
             try:
                 if bond['ISIN'] in bonds_isin:
                     enroll = round(float(bond['COUPONVALUE']) * (365 // int(bond['COUPONPERIOD'])) / float(bond['LOTVALUE']) * 100, 3)
                     data.append({
                         'security_id': bond['SECID'],
-                        'short_name': bond['SHORTNAME'],
-                        'nominal': bond['LOTVALUE'],
-                        'coupon_value': bond['COUPONVALUE'],
-                        'nkd': bond['ACCRUEDINT'],
+                        'name_paper': str(bond['SHORTNAME']),
+                        'nominal': int(bond['LOTVALUE']),
+                        'coupon_value': float(bond['COUPONVALUE']),
+                        'nkd': float(bond['ACCRUEDINT']),
                         'next_coupon_date': bond['NEXTCOUPON'],
                         'maturity_date': bond['MATDATE'],
-                        'coupon_period': bond['COUPONPERIOD'],
+                        'coupon_period': int(bond['COUPONPERIOD']),
                         'coupon_enroll': f"{enroll} %"
                     })
 
@@ -46,3 +52,12 @@ class InfoPaper:
             except KeyError:
                 continue
         return data
+
+    def get_price_paper(self, bonds_isin: str = 'RU000A106P63'):
+        # data = {}
+        # for bond in bonds_isin:
+        price_element = self.response_soup(self.price_url(bonds_isin)).find('row', {'SECID': bonds_isin})
+            # print(price_element)
+        return price_element['PREVWAPRICE'] if price_element else None
+        #     data[bond] = current_price
+        # return data
