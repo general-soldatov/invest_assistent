@@ -3,7 +3,8 @@ from os.path import isfile, join
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns, NominalPaper
-from typing import List
+from typing import List, Dict
+from moex_parser import InfoPaper
 # from models.table_parse import ParseTable
 
 
@@ -42,6 +43,47 @@ class MainPage:
             result.append(cash_flow.__dict__)
             cash += cash_flow.sum
         return result, round(cash, 2)
+
+    def get_bonds(self, types='Облигация'):
+        data: SecurityDirectory = self.Session().query(SecurityDirectory.isin_paper).\
+            where(SecurityDirectory.type_paper.startswith(types)).all()
+
+        return InfoPaper().get_bonds_lst([item[0] for item in data])
+
+    def get_count_paper(self):
+        papers: SecurityDirectory = self.Session().query(SecurityDirectory.name_paper).all()
+        data: List[Transactions] = self.Session().query(Transactions)
+        nominal: dict = {item.name_paper: item.nominal
+                                       for item in self.Session().query(NominalPaper).all()}
+        dict_paper = {item[0]: {'credit': 0, 'debet': 0, 'count': 0} for item in papers}
+        for item in data:
+            if item.name_paper not in dict_paper:
+                continue
+            if item.name_paper not in nominal:
+                nominal[item.name_paper] = 1000
+            dict_paper[item.name_paper]['credit'] += (item.broker_comission + item.market_comission) * item.count_paper
+            saler = item.price_paper * item.count_paper * nominal[item.name_paper] / 100
+            if item.type_deal == 'Покупка':
+                dict_paper[item.name_paper]['credit'] += saler
+                dict_paper[item.name_paper]['count'] += item.count_paper
+            elif item.type_deal == "Продажа":
+                dict_paper[item.name_paper]['debet'] += saler
+                dict_paper[item.name_paper]['count'] -= item.count_paper
+
+        return dict_paper
+
+    def get_coupons(self):
+        dict_paper = self.get_count_paper()
+        data: List[Enrollments] = self.Session().query(Enrollments).all()
+        for item in data:
+            if item.type_operation == 'погашение':
+                dict_paper[item.name_paper]['count'] = 0
+            dict_paper[item.name_paper]['debet'] += item.sum_enroll
+
+        return dict_paper
+
+
+
 
 def add_data(Session: sessionmaker):
     mypath = 'stack_data'
@@ -125,8 +167,8 @@ def main():
     #     my_write_down(Session) + enrollment(Session, oper='погашение') - \
     #     transactions(Session) + transactions(Session, 'Продажа') + enrollment(Session, oper='амортизация')
     # print(cash)
-    data, cash = MainPage().transactions()
-    print(data[5])
+    data = MainPage().get_coupons()
+    print(data)
 
 
 if __name__ == '__main__':

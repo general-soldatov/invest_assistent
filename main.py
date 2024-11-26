@@ -1,5 +1,6 @@
 import eel
 from mail_parse import MainPage
+
 # from jinja2 import Environment, PackageLoader, select_autoescape, Template
 
 # env = Environment(
@@ -26,6 +27,11 @@ def coupons(enrollments=None):
 def transactions(types = 'Покупка'):
     data, cash = MainPage().transactions(types)
     return data, cash
+
+@eel.expose
+def moex_data():
+    lst = MainPage().get_bonds()
+    return lst
 
 
 

@@ -6,8 +6,24 @@ const dataJSON = {
   "transactions": {
       "head": {"Date": 15, "Name Paper": 25, "type_deal": 10, "Price Paper": 20, "Count Paper": 10, "Sum": 20},
       "keys": ["date_deal", "name_paper", "type_deal", "price_paper",  "count_paper", "sum"]
+  },
+  "bonds": {
+      "head": {"Облигация": 20, "Номинал": 10, "Купон": 10, "НКД": 10, "Следующая выплата": 15, "Дата погашения": 15, "Периодичность выплат": 10, "Купонная доходность": 10},
+      "keys": ["short_name", "nominal", "coupon_value", "nkd",  "next_coupon_date", "maturity_date", "coupon_period", "coupon_enroll"]
   }
 };
+
+// # print(f'''
+//   # Облигация: {short_name}
+//   # Идентификатор: {security_id}
+//   # Номинал: {nominal}
+//   # Купон: {coupon_value}
+//   # НКД: {nkd}
+//   # ISIN: {isin}
+//   # Следующая выплата: {next_coupon_date}
+//   # Дата погашения: {maturity_date}
+//   # Периодичность выплат: {coupon_period}
+//   # ''')
 
 function getEnrollments(dataDB=[], cash=0, tableName = 'coupons') {
     const head = dataJSON[tableName].head;
@@ -56,7 +72,11 @@ function getMenu() {
                   'Продажи': async function() {
                     data_coupon = await eel.transactions('Продажа')();
                     getEnrollments(data_coupon[0], data_coupon[1], tableName="transactions");
-                }};
+                },
+                'Облигации': async function() {
+                  data_coupon = await eel.moex_data()();
+                  getEnrollments(data_coupon, 0, tableName="bonds");
+              }};
   const vision = document.getElementById("menu");
   for (const key in menu) {
       const elem = document.createElement("a");
