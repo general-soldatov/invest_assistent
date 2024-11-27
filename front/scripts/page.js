@@ -1,33 +1,38 @@
-const dataJSON = {
-  "coupons": {
-      "head": {"Date": 15, "Operation": 20, "Name Paper": 45, "Sum": 20},
-      "keys": ["date_operation", "type_operation", "name_paper",  "sum_enroll"]
-  },
-  "transactions": {
-      "head": {"Date": 15, "Name Paper": 25, "type_deal": 10, "Price Paper": 20, "Count Paper": 10, "Sum": 20},
-      "keys": ["date_deal", "name_paper", "type_deal", "price_paper",  "count_paper", "sum"]
-  },
-  "bonds": {
-      "head": {"Облигация": 20, "Номинал": 10, "Купон": 10, "НКД": 10, "Следующая выплата": 15, "Дата погашения": 15, "Периодичность выплат": 10, "Купонная доходность": 10},
-      "keys": ["name_paper", "nominal", "coupon_value", "nkd",  "next_coupon_date", "maturity_date", "coupon_period", "coupon_enroll"]
-  }
+function addHeader() {
+    const header = {
+      "Главная": "main",
+      "Отчёты": "reports",
+      "Календарь": "calendar",
+      "Меню": "menu",
+      "Настройки": "setting"
+    };
+    const divHeader = document.getElementsByClassName("topnav")[0];
+    for (key in header) {
+      let newElement = document.createElement("a");
+      newElement.textContent = key;
+      newElement.addEventListener("click", function() {
+        const active = document.getElementsByClassName("active");
+        for (item of active) {
+          item.className = "";
+        };
+        newElement.classList.add("active");
+      });
+      // const data = new Menu("setting");
+      newElement.addEventListener("click", getMenu.bind(this, header[key]), false)
+      newElement.href = "#";
+      divHeader.appendChild(newElement);
+    };
+    // const topnav = document.getElementsByClassName("topnav");
+    // for (var i = 0; i < topnav.length; i++) {
+    //     // const data = new Menu("setting");
+    //     topnav[i].addEventListener("click", getMenu.bind(this, "setting"), false);
+
+    // }
 };
 
-// # print(f'''
-//   # Облигация: {short_name}
-//   # Идентификатор: {security_id}
-//   # Номинал: {nominal}
-//   # Купон: {coupon_value}
-//   # НКД: {nkd}
-//   # ISIN: {isin}
-//   # Следующая выплата: {next_coupon_date}
-//   # Дата погашения: {maturity_date}
-//   # Периодичность выплат: {coupon_period}
-//   # ''')
 
-function getEnrollments(dataDB=[], cash=0, tableName = 'coupons') {
-    const head = dataJSON[tableName].head;
-    const keys = dataJSON[tableName].keys;
+async function getEnrollments(dataDB=[], cash=0, tableName = 'coupons', section="reports") {
+    const dataJSON = await eel.import_table(section, tableName)();
     const vision = document.getElementById("content");
     vision.innerHTML = '';
     let table = document.createElement("table");
@@ -35,16 +40,16 @@ function getEnrollments(dataDB=[], cash=0, tableName = 'coupons') {
     vision.appendChild(table);
     let tr = document.createElement("tr");
     table.appendChild(tr);
-    for (const key in head) {
+    for (const key in dataJSON.head) {
       let th = document.createElement("th");
       th.textContent = key;
-      th.style = `width: ${head[key]}%`;
+      th.style = `width: ${dataJSON.head[key]}%`;
       tr.appendChild(th);
     };
     for (item of dataDB) {
       let tr_cikle = document.createElement("tr");
       table.appendChild(tr_cikle);
-      for (const key of keys) {
+      for (const key of dataJSON.keys) {
         let td = document.createElement("td");
         td.textContent = item[key];
         tr_cikle.appendChild(td);
@@ -52,42 +57,70 @@ function getEnrollments(dataDB=[], cash=0, tableName = 'coupons') {
     };
     if (cash != 0) {
       let cash_tr = document.createElement("tr");
-      cash_tr.innerHTML = `${"<th></th>".repeat(keys.length - 2)}<th>Summary</th><th>${cash}</th>`;
+      cash_tr.innerHTML = `${"<th></th>".repeat(dataJSON.keys.length - 2)}<th>Summary</th><th>${cash}</th>`;
       table.appendChild(cash_tr);
     }
 
 };
 
-function getMenu() {
-  const menu = {
-                  'Купоны': async function() {
-                    data_coupon = await eel.coupons("купон")();
-                    getEnrollments(data_coupon[0], data_coupon[1]);
-                },
-                  'Иные доходы': async function() {
-                    data_coupon = await eel.coupons()();
-                    getEnrollments(data_coupon[0], data_coupon[1]);
-                },
-                  'Покупки': async function() {
-                    data_coupon = await eel.transactions('Покупка')();
-                    getEnrollments(data_coupon[0], data_coupon[1], tableName="transactions");
-                },
-                  'Продажи': async function() {
-                    data_coupon = await eel.transactions('Продажа')();
-                    getEnrollments(data_coupon[0], data_coupon[1], tableName="transactions");
-                },
-                'Облигации': async function() {
-                  data_coupon = await eel.moex_data()();
-                  getEnrollments(data_coupon, 0, tableName="bonds");
-              }};
+const menu = {
+  "reports": {
+        'Купоны': async function() {
+          data_coupon = await eel.coupons("купон")();
+          getEnrollments(data_coupon[0], data_coupon[1]);
+      },
+        'Иные доходы': async function() {
+          data_coupon = await eel.coupons()();
+          getEnrollments(data_coupon[0], data_coupon[1]);
+      },
+        'Покупки': async function() {
+          data_coupon = await eel.transactions('Покупка')();
+          getEnrollments(data_coupon[0], data_coupon[1], tableName="transactions");
+      },
+        'Продажи': async function() {
+          data_coupon = await eel.transactions('Продажа')();
+          getEnrollments(data_coupon[0], data_coupon[1], tableName="transactions");
+      },
+      'Облигации': async function() {
+        data_coupon = await eel.moex_data()();
+        getEnrollments(data_coupon, 0, tableName="bonds");
+      },
+  },
+  "main": {
+      'Портфель': async function() {
+        data_coupon = await eel.brief_case()();
+        getEnrollments(data_coupon[0], data_coupon[1], tableName="briefcase");
+      }
+  },
+  "calendar": {
+      'Ttt': async function() {
+        data_coupon = await eel.brief_case()();
+        getEnrollments(data_coupon[0], data_coupon[1], tableName="briefcase");
+      }
+  },
+  "menu": {
+      'Портd': async function() {
+        data_coupon = await eel.brief_case()();
+        getEnrollments(data_coupon[0], data_coupon[1], tableName="briefcase");
+      }
+  },
+  "setting": {
+      'add': async function() {
+        data_coupon = await eel.brief_case()();
+        getEnrollments(data_coupon[0], data_coupon[1], tableName="briefcase");
+      }
+  },
+};
+
+
+function getMenu(select) {
   const vision = document.getElementById("menu");
-  for (const key in menu) {
+  vision.innerHTML = "";
+  for (const key in menu[select]) {
       const elem = document.createElement("a");
       elem.innerHTML = `${key}<br>`;
       elem.href = `#${key}`;
-      elem.addEventListener("click", menu[key]);
+      elem.addEventListener("click", menu[select][key]);
       vision.appendChild(elem);
   };
   };
-
-getMenu()

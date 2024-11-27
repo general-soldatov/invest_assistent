@@ -1,22 +1,14 @@
 import eel
+import json
 from mail_parse import MainPage
-
-# from jinja2 import Environment, PackageLoader, select_autoescape, Template
-
-# env = Environment(
-#     loader=PackageLoader("eel"),
-#     autoescape=select_autoescape()
-# )
-
-# template = Template("My name is {{ name }} and I am {{ age }}")
-
-# data = template.render(name = 'that say nih', age = 2)
 
 eel.init('front')
 
 @eel.expose
-def summer(x, y):
-    return x + y
+def import_table(table: str, name: str) -> dict:
+    with open('front/static/table.json', encoding='utf-8') as js_file:
+        data = json.load(js_file)
+        return data[table][name]
 
 @eel.expose
 def coupons(enrollments=None):
@@ -31,6 +23,11 @@ def transactions(types = 'Покупка'):
 @eel.expose
 def moex_data():
     lst = MainPage().get_bonds_sql()
+    return lst
+
+@eel.expose
+def brief_case():
+    lst = MainPage().get_briefcase()
     return lst
 
 

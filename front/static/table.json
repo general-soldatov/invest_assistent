@@ -1,0 +1,21 @@
+{
+    "reports": {
+        "coupons": {
+            "head": {"Date": 15, "Operation": 20, "Name Paper": 45, "Sum": 20},
+            "keys": ["date_operation", "type_operation", "name_paper",  "sum_enroll"]
+        },
+        "transactions": {
+            "head": {"Date": 15, "Name Paper": 25, "type_deal": 10, "Price Paper": 20, "Count Paper": 10, "Sum": 20},
+            "keys": ["date_deal", "name_paper", "type_deal", "price_paper",  "count_paper", "sum"]
+        },
+        "bonds": {
+            "head": {"Облигация": 20, "Номинал": 10, "Купон": 10, "НКД": 10, "Следующая выплата": 15, "Дата погашения": 15, "Периодичность выплат": 10, "Купонная доходность": 10},
+            "keys": ["name_paper", "nominal", "coupon_value", "nkd",  "next_coupon_date", "maturity_date", "coupon_period", "coupon_enroll"]
+        },
+        "briefcase": {
+          "head": {"Облигация": 20, "Расходы": 10, "Приход": 10, "Количество": 10, "Цена": 15, "Сумма": 15, "Доходность": 10, "Купонная доходность": 10},
+          "keys": ["name_paper", "credit", "debet", "count", "price", "sum", "sum", "sum"]
+      }
+      }
+
+}

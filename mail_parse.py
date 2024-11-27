@@ -77,7 +77,8 @@ class MainPage:
         for item in data:
             if item.type_operation == 'погашение':
                 dict_paper[item.name_paper]['count'] = 0
-            dict_paper[item.name_paper]['debet'] += item.sum_enroll
+            dict_paper[item.name_paper]['debet'] = round(dict_paper[item.name_paper]['debet'] + item.sum_enroll, 2)
+            dict_paper[item.name_paper]['credit'] = round(dict_paper[item.name_paper]['credit'], 2)
 
         return dict_paper
 
@@ -86,9 +87,10 @@ class MainPage:
         return [item.__dict__ for item in data]
 
     def get_briefcase(self):
-        data = self.Session().query(BondInfo.name_paper, BondInfo.security_id).all()
-        papers = self.get_count_paper()
+        data = self.Session().query(BondInfo.name_paper, BondInfo.security_id, BondInfo.nominal).all()
+        papers = self.get_coupons()
         result = []
+        cash = 0
         for item in data:
             name = item[0]
             if 'ОФЗ ' in name:
@@ -97,11 +99,13 @@ class MainPage:
                 dct = {**papers[name], 'name_paper': name}
             except KeyError:
                 continue
-            dct['price'] = InfoPaper().get_price_paper(item[1])
+            dct['price'] = InfoPaper().get_price_paper(item[1]) * item[2] / 100
             if dct['count'] < 0:
                 dct['count'] = 0
+            dct['sum'] = round(dct['price'] * dct['count'], 2)
+            cash += dct['sum']
             result.append(dct)
-        return result
+        return result, round(cash, 2)
 
 
 
@@ -191,7 +195,7 @@ def main():
     # data = MainPage().get_bonds_sql()
     # print(InfoPaper().get_price_paper(['RU000A1058K7']))
     data = MainPage().get_briefcase()
-    [print(item) for item in data]
+    print(data)
     # data = [{'security_id': 'SU26243RMFS4', 'name_paper': 'ОФЗ 26243', 'nominal': 1000, 'coupon_value': 48.87, 'nkd': 46.99, 'next_coupon_date': '2024-12-04', 'maturity_date': '2038-05-19', 'coupon_period': 182, 'coupon_enroll': '9.774 %'}]
     # DBManager(Session, file_path='stack_data/400PJLR_010121_310121_M.html').add_bond_info(data)
     # print(data)

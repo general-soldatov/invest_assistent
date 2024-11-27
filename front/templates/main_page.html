@@ -12,28 +12,9 @@
           <div id="content"></div>
         </div>
 
-        <script>
-          function addHeader() {
-          header = {
-            "Главная": "#home",
-            "Отчёты": "#reports",
-            "Календарь": "#calendar",
-            "Меню": "#menu",
-            "Настройки": "#set"
-          };
-          const divHeader = document.getElementsByClassName("topnav")[0];
-          for (key in header) {
-            let newElement = document.createElement("a");
-            newElement.textContent = key;
-            if (key == "Отчёты") {
-              newElement.classList.add("active");
-            };
-            newElement.href = header[key]
-            divHeader.appendChild(newElement);
-          };
-        };
-        addHeader();
-        </script>
+        <!-- <script>
+
+        </script> -->
         <script type="text/javascript" src="/scripts/page.js"></script>
         <p id="data"></p>
         <input type="text" id="test" name="email">
@@ -44,10 +25,11 @@
         <input type="submit" class="btn" id="js_btn" value="Click">
         <p id="par_block">Hello</p>
         <script>
+            addHeader();
             async function data_stream() {
                 let num_1 = parseFloat(document.getElementById("test").value);
                 let num_2 = parseFloat(document.getElementById("test2").value);
-                document.getElementById("p1").innerHTML = await eel.summer(num_1, num_2)();
+                document.getElementById("p1").innerHTML = 3;
             };
             document.getElementById("p1").innerHTML = "Calc";
         </script>

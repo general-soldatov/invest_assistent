@@ -54,10 +54,7 @@ class InfoPaper:
         return data
 
     def get_price_paper(self, bonds_isin: str = 'RU000A106P63'):
-        # data = {}
-        # for bond in bonds_isin:
-        price_element = self.response_soup(self.price_url(bonds_isin)).find('row', {'SECID': bonds_isin})
-            # print(price_element)
-        return price_element['PREVWAPRICE'] if price_element else None
-        #     data[bond] = current_price
-        # return data
+        price_element = self.response_soup(self.price_url(bonds_isin)).findAll('row', {'SECID': bonds_isin})[1]
+        data = price_element.get('PREVPRICE', 0) \
+                        if price_element.get('PREVPRICE', 0) else price_element.get('OFFER', 0)
+        return float(data)
