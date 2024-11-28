@@ -34,7 +34,7 @@ class InfoPaper:
         for bond in bonds:
             try:
                 if bond['ISIN'] in bonds_isin:
-                    enroll = round(float(bond['COUPONVALUE']) * (365 // int(bond['COUPONPERIOD'])) / float(bond['LOTVALUE']) * 100, 3)
+                    enroll = float(bond['COUPONVALUE']) * (365 // int(bond['COUPONPERIOD'])) / float(bond['LOTVALUE']) * 100
                     data.append({
                         'security_id': bond['SECID'],
                         'name_paper': str(bond['SHORTNAME']),
@@ -57,4 +57,4 @@ class InfoPaper:
         price_element = self.response_soup(self.price_url(bonds_isin)).findAll('row', {'SECID': bonds_isin})[1]
         data = price_element.get('PREVPRICE', 0) \
                         if price_element.get('PREVPRICE', 0) else price_element.get('OFFER', 0)
-        return float(data)
+        return float(data or 0)

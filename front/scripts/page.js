@@ -17,19 +17,15 @@ function addHeader() {
         };
         newElement.classList.add("active");
       });
-      // const data = new Menu("setting");
       newElement.addEventListener("click", getMenu.bind(this, header[key]), false)
       newElement.href = "#";
       divHeader.appendChild(newElement);
     };
-    // const topnav = document.getElementsByClassName("topnav");
-    // for (var i = 0; i < topnav.length; i++) {
-    //     // const data = new Menu("setting");
-    //     topnav[i].addEventListener("click", getMenu.bind(this, "setting"), false);
-
-    // }
 };
 
+function isFloat(n){
+  return Number(n) === n && n % 1 !== 0;
+}
 
 async function getEnrollments(dataDB=[], cash=0, tableName = 'coupons', section="reports") {
     const dataJSON = await eel.import_table(section, tableName)();
@@ -51,12 +47,19 @@ async function getEnrollments(dataDB=[], cash=0, tableName = 'coupons', section=
       table.appendChild(tr_cikle);
       for (const key of dataJSON.keys) {
         let td = document.createElement("td");
-        td.textContent = item[key];
+        let content = item[key];
+        if (isFloat(content)) {
+          content = content.toFixed(2);
+        }
+        td.textContent = content
         tr_cikle.appendChild(td);
       };
     };
     if (cash != 0) {
       let cash_tr = document.createElement("tr");
+      if (isFloat(cash)) {
+        cash = cash.toFixed(2);
+      }
       cash_tr.innerHTML = `${"<th></th>".repeat(dataJSON.keys.length - 2)}<th>Summary</th><th>${cash}</th>`;
       table.appendChild(cash_tr);
     }

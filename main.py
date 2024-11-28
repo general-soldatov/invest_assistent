@@ -31,5 +31,4 @@ def brief_case():
     return lst
 
 
-
 eel.start('templates/main_page.html', jinja_templates='templates')

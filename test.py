@@ -28,3 +28,10 @@
 # print('Nominal')
 # for item in parse.nominal_paper():
 #     print(item.__dict__)
+
+from datetime import datetime
+
+
+date = '2025-01-29'
+
+print(datetime.fromisoformat(date))

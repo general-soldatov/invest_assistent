@@ -13,8 +13,8 @@
             "keys": ["name_paper", "nominal", "coupon_value", "nkd",  "next_coupon_date", "maturity_date", "coupon_period", "coupon_enroll"]
         },
         "briefcase": {
-          "head": {"Облигация": 20, "Расходы": 10, "Приход": 10, "Количество": 10, "Цена": 15, "Сумма": 15, "Доходность": 10, "Купонная доходность": 10},
-          "keys": ["name_paper", "credit", "debet", "count", "price", "sum", "sum", "sum"]
+          "head": {"Облигация": 15, "Расходы": 10, "Приход": 10, "Купон": 10, "Количество": 10, "Цена": 10, "Сумма": 15, "Доходность": 10, "Купонная доходность": 10},
+          "keys": ["name_paper", "credit", "debet", "coupons", "count", "price", "sum", "fv_enroll", "day_to"]
       }
       }
 

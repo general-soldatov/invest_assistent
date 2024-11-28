@@ -5,7 +5,17 @@ from sqlalchemy.orm import sessionmaker
 from database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns, NominalPaper, BondInfo
 from typing import List, Dict
 from moex_parser import InfoPaper
+from datetime import datetime
 # from models.table_parse import ParseTable
+
+def future_value_enroll(nominal: int, count: int,
+                        credit: float, debet: float, day_to: int,
+                        period: int, coupon_value: float, coupons: float):
+    yearDay = 365
+    count_coupon = day_to / period + 1
+    bonds_coupons = count_coupon * coupon_value
+    coef_relative = ((nominal + bonds_coupons) * count - credit + debet + coupons) / (credit - debet)
+    return coef_relative * yearDay / day_to * 100
 
 
 class MainPage:
@@ -23,7 +33,7 @@ class MainPage:
             item.date_operation = item.date_operation.strftime("%d.%m.%Y")
             result.append(item.__dict__)
             cash += item.sum_enroll
-        return result, round(cash, 2)
+        return result, cash
 
     def transactions(self, types='Покупка'):
         data: Transactions = self.Session().query(Transactions, NominalPaper, SecurityDirectory).\
@@ -36,12 +46,12 @@ class MainPage:
             cash_flow.date_deal = cash_flow.date_deal.strftime("%d.%m.%Y")
             cash_flow.nominal = nominal.nominal
             cash_flow.type = sec.type_paper
-            cash_flow.sum = round(cash_flow.price_paper * cash_flow.count_paper, 2)
+            cash_flow.sum = cash_flow.price_paper * cash_flow.count_paper
             if 'Облигация' in cash_flow.type:
-                cash_flow.sum = round(cash_flow.sum * nominal.nominal / 100, 2)
+                cash_flow.sum = cash_flow.sum * nominal.nominal / 100
             result.append(cash_flow.__dict__)
             cash += cash_flow.sum
-        return result, round(cash, 2)
+        return result, cash
 
     def get_bonds(self, types='Облигация'):
         data: SecurityDirectory = self.Session().query(SecurityDirectory.isin_paper).\
@@ -54,7 +64,7 @@ class MainPage:
         data: List[Transactions] = self.Session().query(Transactions)
         nominal: dict = {item.name_paper: item.nominal
                                        for item in self.Session().query(NominalPaper).all()}
-        dict_paper = {item[0]: {'credit': 0, 'debet': 0, 'count': 0} for item in papers}
+        dict_paper = {item[0]: {'credit': 0, 'debet': 0, 'count': 0, 'coupons': 0} for item in papers}
         for item in data:
             if item.name_paper not in dict_paper:
                 continue
@@ -77,8 +87,11 @@ class MainPage:
         for item in data:
             if item.type_operation == 'погашение':
                 dict_paper[item.name_paper]['count'] = 0
-            dict_paper[item.name_paper]['debet'] = round(dict_paper[item.name_paper]['debet'] + item.sum_enroll, 2)
-            dict_paper[item.name_paper]['credit'] = round(dict_paper[item.name_paper]['credit'], 2)
+            if item.type_operation == 'купон':
+                dict_paper[item.name_paper]['coupons'] = dict_paper[item.name_paper]['coupons'] + item.sum_enroll
+                continue
+            dict_paper[item.name_paper]['debet'] = dict_paper[item.name_paper]['debet'] + item.sum_enroll
+            dict_paper[item.name_paper]['credit'] = dict_paper[item.name_paper]['credit']
 
         return dict_paper
 
@@ -87,7 +100,9 @@ class MainPage:
         return [item.__dict__ for item in data]
 
     def get_briefcase(self):
-        data = self.Session().query(BondInfo.name_paper, BondInfo.security_id, BondInfo.nominal).all()
+        data = self.Session().query(BondInfo.name_paper, BondInfo.security_id,
+                                    BondInfo.nominal, BondInfo.maturity_date,
+                                    BondInfo.coupon_period, BondInfo.coupon_value).all()
         papers = self.get_coupons()
         result = []
         cash = 0
@@ -100,12 +115,23 @@ class MainPage:
             except KeyError:
                 continue
             dct['price'] = InfoPaper().get_price_paper(item[1]) * item[2] / 100
-            if dct['count'] < 0:
-                dct['count'] = 0
-            dct['sum'] = round(dct['price'] * dct['count'], 2)
+            if dct['count'] <= 0:
+                continue
+            dct['sum'] = dct['price'] * dct['count']
+            try:
+                dct['day_to'] = (datetime.fromisoformat(item[3]) - datetime.now()).days
+                # dct['fv_enroll'] = (float(item[2]) * dct['count'] - dct['credit'] \
+                #                  + dct['debet']) / dct['credit'] * 365 / dct['day_to']
+                dct['fv_enroll'] = future_value_enroll(
+                    item[2], dct['count'], dct['credit'], dct['debet'],
+                    dct['day_to'], *item[4:], dct['coupons']
+                    )
+            except ValueError:
+                dct['day_to'] = 0
+                dct['fv_enroll'] = 0
             cash += dct['sum']
             result.append(dct)
-        return result, round(cash, 2)
+        return result, cash
 
 
 
