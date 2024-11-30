@@ -120,10 +120,29 @@ function getMenu(select) {
   const vision = document.getElementById("menu");
   vision.innerHTML = "";
   for (const key in menu[select]) {
-      const elem = document.createElement("a");
-      elem.innerHTML = `${key}<br>`;
+      const elem = document.createElement("button");
+      elem.className = "tablinks"
+      elem.innerHTML = key;
       elem.href = `#${key}`;
-      elem.addEventListener("click", menu[select][key]);
+      elem.addEventListener("click", function () {
+        menu[select][key]();
+        const tablinks = document.getElementsByClassName("tablinks");
+        for (tab of tablinks) {
+          tab.className = tab.className.replace(" active", "");
+        };
+        elem.className += " active";
+      });
       vision.appendChild(elem);
   };
   };
+
+
+async function binaryImage() {
+  const base64String = await eel.get_image()();
+  const imageSrc = `data:image/png;base64,${base64String}`;
+  const img = document.createElement('img');
+  img.src = imageSrc;
+  document.body.appendChild(img);
+}
+
+// binaryImage();
