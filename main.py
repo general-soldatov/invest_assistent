@@ -2,6 +2,7 @@ import eel
 import json
 from mail_parse import MainPage
 import base64
+from models.graph_plots import graph_bytes
 
 eel.init('front')
 
@@ -33,11 +34,11 @@ def brief_case():
 
 @eel.expose
 def get_image():
-    with open('front/static/image.png', "rb") as image:
-        binary_file_data = image.read()
-        base64_encoded_data = base64.b64encode(binary_file_data)
-        base64_message = base64_encoded_data.decode('utf-8')
-        return base64_message
+    # with open('front/static/image.png', "rb") as image:
+    #     binary_file_data = image.read()
+    #     base64_encoded_data = base64.b64encode(binary_file_data)
+    #     base64_message = base64_encoded_data.decode('utf-8')
+    return graph_bytes().decode('utf-8')
 
 
 eel.start('templates/main_page.html', jinja_templates='templates')

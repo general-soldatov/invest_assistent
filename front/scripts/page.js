@@ -125,6 +125,11 @@ function getMenu(select) {
       elem.innerHTML = key;
       elem.href = `#${key}`;
       elem.addEventListener("click", function () {
+        const content = document.getElementById("content");
+        content.innerHTML = '';
+        const div_load = document.createElement("div");
+        div_load.className ="spinner";
+        content.appendChild(div_load);
         menu[select][key]();
         const tablinks = document.getElementsByClassName("tablinks");
         for (tab of tablinks) {
@@ -145,4 +150,4 @@ async function binaryImage() {
   document.body.appendChild(img);
 }
 
-// binaryImage();
+binaryImage();
