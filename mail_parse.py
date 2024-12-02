@@ -133,6 +133,24 @@ class MainPage:
             result.append(dct)
         return result, cash
 
+    def get_cash(self):
+        data: List[MyCash] = self.Session().query(MyCash).all()
+        data_year = {}
+        for item in data:
+            data_year.setdefault(item.date_operation.year, 0)
+            data_year[item.date_operation.year] += item.sum_enroll
+        return data_year, sum(data_year.values())
+
+    def get_write_down(self):
+        query = select(WriteDowns)
+        data: List[WriteDowns] = self.Session().scalars(query).all()
+        data_year = {}
+        for item in data:
+            if item.operation == 'Списание д/с':
+                data_year.setdefault(item.date_operation.year, 0)
+                data_year[item.date_operation.year] += item.sum_enroll
+        return data_year, sum(data_year.values())
+
 
 
 def add_data(Session: sessionmaker):
@@ -145,15 +163,6 @@ def add_data(Session: sessionmaker):
         db.add_nominal()
         db.add_cash_flow()
         # ParseTable(f'{mypath}/{file}')
-
-def query(Session: sessionmaker):
-    query = select(Enrollments).where(Enrollments.type_operation != 'купон')
-    data: Enrollments = Session().scalars(query).all()
-    result = 0
-    for item in data:
-        # result += item.price_paper * item.count_paper * 10
-        print(item.__dict__)
-    print(result)
 
 
 
@@ -174,14 +183,6 @@ def transactions(Session: sessionmaker, type_deal = 'Покупка'):
         cash += value
     return cash
 
-def my_cash(Session: sessionmaker):
-    query = select(MyCash)
-    data: List[MyCash] = Session().scalars(query).all()
-    result = 0
-    for item in data:
-        result += item.sum_enroll
-        # print(item.__dict__)
-    return result
 
 def my_write_down(Session: sessionmaker):
     query = select(WriteDowns)
@@ -190,7 +191,6 @@ def my_write_down(Session: sessionmaker):
     for item in data:
         if item.operation == 'Списание д/с':
             result += item.sum_enroll
-            # print(item.__dict__)
     return result
 
 def enrollment(Session: sessionmaker, oper = 'купон'):
@@ -220,7 +220,7 @@ def main():
     # data = MainPage().get_bonds()
     # data = MainPage().get_bonds_sql()
     # print(InfoPaper().get_price_paper(['RU000A1058K7']))
-    data = MainPage().get_briefcase()
+    data = MainPage().get_write_down()
     print(data)
     # data = [{'security_id': 'SU26243RMFS4', 'name_paper': 'ОФЗ 26243', 'nominal': 1000, 'coupon_value': 48.87, 'nkd': 46.99, 'next_coupon_date': '2024-12-04', 'maturity_date': '2038-05-19', 'coupon_period': 182, 'coupon_enroll': '9.774 %'}]
     # DBManager(Session, file_path='stack_data/400PJLR_010121_310121_M.html').add_bond_info(data)

@@ -29,9 +29,16 @@
 # for item in parse.nominal_paper():
 #     print(item.__dict__)
 
-from datetime import datetime
+# from datetime import date
 
+# birthday = date(1992, 10, 6)
 
-date = '2025-01-29'
+# print('Название месяца:', birthday.strftime('%B'))
+# print('Название дня недели:', birthday.strftime('%A'))
+# print('Год:', birthday.strftime('%Y'))
+# print('Месяц:', birthday.strftime('%m'))
+# print('День:', birthday.strftime('%d'))
 
-print(datetime.fromisoformat(date))
+# andrew = date(1992, 8, 24)
+
+# print(andrew.strftime('%Y-%j'))   # выводим дату в формате YYYY-day_number
