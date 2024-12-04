@@ -2,7 +2,8 @@ import eel
 import json
 from mail_parse import MainPage
 import base64
-from models.graph_plots import graph_bytes
+# from models.graph_plots import graph_bytes
+from models.graph_plots import ByteGraph
 
 eel.init('front')
 
@@ -34,11 +35,9 @@ def brief_case():
 
 @eel.expose
 def get_image():
-    # with open('front/static/image.png', "rb") as image:
-    #     binary_file_data = image.read()
-    #     base64_encoded_data = base64.b64encode(binary_file_data)
-    #     base64_message = base64_encoded_data.decode('utf-8')
-    return graph_bytes().decode('utf-8')
+    data = ByteGraph()
+    data.graph_1(MainPage().get_cash())
+    return data.graph_bytes()
 
 
 eel.start('templates/main_page.html', jinja_templates='templates')

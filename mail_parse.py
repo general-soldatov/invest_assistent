@@ -139,7 +139,7 @@ class MainPage:
         for item in data:
             data_year.setdefault(item.date_operation.year, 0)
             data_year[item.date_operation.year] += item.sum_enroll
-        return data_year, sum(data_year.values())
+        return data_year #, sum(data_year.values())
 
     def get_write_down(self):
         query = select(WriteDowns)
@@ -149,7 +149,7 @@ class MainPage:
             if item.operation == 'Списание д/с':
                 data_year.setdefault(item.date_operation.year, 0)
                 data_year[item.date_operation.year] += item.sum_enroll
-        return data_year, sum(data_year.values())
+        return data_year #, sum(data_year.values())
 
 
 

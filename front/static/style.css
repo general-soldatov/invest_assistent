@@ -47,6 +47,7 @@ body {
   #content {
     width: 90%;
     margin-left: 10px;
+    display: flex;
   }
 
   table, th, td {

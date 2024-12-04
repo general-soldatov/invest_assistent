@@ -32,7 +32,7 @@ async function getEnrollments(dataDB=[], cash=0, tableName = 'coupons', section=
     const vision = document.getElementById("content");
     vision.innerHTML = '';
     let table = document.createElement("table");
-    table.style = "width:100%"
+    table.style = "width:100%";
     vision.appendChild(table);
     let tr = document.createElement("tr");
     table.appendChild(tr);
@@ -90,10 +90,30 @@ const menu = {
       },
   },
   "main": {
+      'Дашборд': async function() {
+        const vision = document.getElementById("content");
+        vision.innerHTML = '';
+        function data_lans() {
+          const divs = document.createElement("div");
+          binaryImage(divs);
+          vision.appendChild(divs);
+        }
+        data_lans();
+        data_lans();
+        data_lans();
+        // div_1.style = "float: left";
+        // const div_2 = document.createElement("div");
+        // binaryImage(div_2);
+        // div_2.style = "width: 25%";
+
+
+        // vision.appendChild(div_2);
+
+      },
       'Портфель': async function() {
         data_coupon = await eel.brief_case()();
         getEnrollments(data_coupon[0], data_coupon[1], tableName="briefcase");
-      }
+      },
   },
   "calendar": {
       'Ttt': async function() {
@@ -142,12 +162,14 @@ function getMenu(select) {
   };
 
 
-async function binaryImage() {
+async function binaryImage(elem, width='100%') {
   const base64String = await eel.get_image()();
   const imageSrc = `data:image/png;base64,${base64String}`;
   const img = document.createElement('img');
   img.src = imageSrc;
-  document.body.appendChild(img);
+  img.style = `width: ${width}`
+  // elem.innerHTML = '';
+  elem.appendChild(img);
 }
 
-binaryImage();
+// binaryImage(document.body);
