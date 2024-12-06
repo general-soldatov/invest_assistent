@@ -4,6 +4,7 @@ from mail_parse import MainPage
 import base64
 # from models.graph_plots import graph_bytes
 from models.graph_plots import ByteGraph
+from moex_parser import InfoPaper
 
 eel.init('front')
 
@@ -36,8 +37,19 @@ def brief_case():
 @eel.expose
 def get_image():
     data = ByteGraph()
-    data.graph_1(MainPage().get_cash())
-    return data.graph_bytes()
+    to_data = {
+        'my_cash': MainPage().get_cash('cash'),
+        'coupons': MainPage().get_cash('coupons'),
+        'enrollments': MainPage().get_cash('enrollments'),
+        'get_cash': MainPage().get_cash('get_cash')
+    }
+    result = {}
+    for key, value in to_data.items():
+        data.graph_1(value)
+        result[key] = data.graph_bytes()
+    data.graph_cash(*InfoPaper().get_exchange_rate())
+    result['money_cb'] = data.graph_bytes()
+    return result
 
 
 eel.start('templates/main_page.html', jinja_templates='templates')

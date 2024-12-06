@@ -6,6 +6,7 @@ class InfoPaper:
     def __init__(self):
         self.url_bond_seq = 'https://iss.moex.com/iss/engines/stock/markets/bonds/securities.xml'
         self.price_url = lambda x: f'https://iss.moex.com/iss/engines/stock/markets/bonds/securities.xml?securities={x}'
+        self.exchange_rate = 'https://iss.moex.com/iss/statistics/engines/currency/markets/selt/rates'
 
     @staticmethod
     def response_soup(url) -> BeautifulSoup:
@@ -58,3 +59,12 @@ class InfoPaper:
         data = price_element.get('PREVPRICE', 0) \
                         if price_element.get('PREVPRICE', 0) else price_element.get('OFFER', 0)
         return float(data or 0)
+
+    def get_exchange_rate(self):
+        elem = self.response_soup(self.exchange_rate).find('row')
+        data = (elem.get('CBRF_USD_LAST', 0), elem.get('CBRF_EUR_LAST', 0),
+                elem.get('CBRF_USD_LASTCHANGEPRCNT', 0), elem.get('CBRF_EUR_LASTCHANGEPRCNT', 0))
+        return map(lambda x: round(float(x), 2), data)
+
+if __name__ == '__main__':
+    print(InfoPaper().get_exchange_rate())

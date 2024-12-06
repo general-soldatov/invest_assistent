@@ -42,14 +42,14 @@
 # andrew = date(1992, 8, 24)
 
 # print(andrew.strftime('%Y-%j'))   # выводим дату в формате YYYY-day_number
-from mail_parse import MainPage
-from models.graph_plots import ByteGraph
+# from mail_parse import MainPage
+# from models.graph_plots import ByteGraph
 
 
-def main():
-    data = ByteGraph()
-    data.graph_1(MainPage().get_cash())
-    data.graph_bytes()
+# def main():
+#     data = ByteGraph()
+#     data.graph_1(MainPage().get_cash())
+#     data.graph_bytes()
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

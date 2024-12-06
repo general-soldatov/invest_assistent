@@ -133,13 +133,20 @@ class MainPage:
             result.append(dct)
         return result, cash
 
-    def get_cash(self):
-        data: List[MyCash] = self.Session().query(MyCash).all()
+    def get_cash(self, type_cash='cash'):
+        query = {
+            'cash': [MyCash, MyCash.sum_enroll != 0],
+            'coupons': [Enrollments, Enrollments.type_operation == 'купон'],
+            'enrollments': [Enrollments, Enrollments.type_operation == 'погашение'],
+            'get_cash': [WriteDowns, WriteDowns.operation == 'Списание д/с']
+        }
+        data: List[MyCash] = self.Session().query(
+            query[type_cash][0]).where(query[type_cash][1]).all()
         data_year = {}
         for item in data:
             data_year.setdefault(item.date_operation.year, 0)
             data_year[item.date_operation.year] += item.sum_enroll
-        return data_year #, sum(data_year.values())
+        return data_year
 
     def get_write_down(self):
         query = select(WriteDowns)
@@ -220,7 +227,7 @@ def main():
     # data = MainPage().get_bonds()
     # data = MainPage().get_bonds_sql()
     # print(InfoPaper().get_price_paper(['RU000A1058K7']))
-    data = MainPage().get_write_down()
+    data = MainPage().get_cash('write-down')
     print(data)
     # data = [{'security_id': 'SU26243RMFS4', 'name_paper': 'ОФЗ 26243', 'nominal': 1000, 'coupon_value': 48.87, 'nkd': 46.99, 'next_coupon_date': '2024-12-04', 'maturity_date': '2038-05-19', 'coupon_period': 182, 'coupon_enroll': '9.774 %'}]
     # DBManager(Session, file_path='stack_data/400PJLR_010121_310121_M.html').add_bond_info(data)
