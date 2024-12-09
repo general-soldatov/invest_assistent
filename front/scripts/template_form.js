@@ -7,6 +7,7 @@ class FormMaker {
 
     integration (idName = 'content') {
       const vision = document.getElementById(idName);
+      vision.innerHTML = '';
       vision.appendChild(this.form);
     }
 

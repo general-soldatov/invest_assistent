@@ -52,8 +52,14 @@ def get_image():
     return result
 
 @eel.expose
-def get_form(data):
+def get_transaction(data):
     print(data)
 
+@eel.expose
+def get_form(data, file):
+    print(data)
+    with open('photo.jpg', 'wb') as fls:
+        fls.write(base64.b64decode(file))
 
-eel.start('templates/main_page.html', jinja_templates='templates')
+
+eel.start('templates/main_page.html', jinja_templates='templates', size=(800, 600))

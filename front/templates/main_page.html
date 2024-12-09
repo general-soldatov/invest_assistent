@@ -17,22 +17,11 @@
         <script type="text/javascript" src="/scripts/template_form.js"></script>
         <script type="text/javascript" src="/scripts/set_report.js"></script>
         <script type="text/javascript" src="/scripts/page.js"></script>
-        <p id="data"></p>
-        <input type="text" id="test" name="email">
-        <input type="text" id="test2" name="data">
-        <input type="submit" class="btn" id="btn-sum" value="Click" onclick="data_stream()">
-        <h1></h1>
-        <input type="text" id="js_text" name="data">
-        <input type="submit" class="btn" id="js_btn" value="Click">
-        <p id="par_block">Hello</p>
         <script>
             addHeader();
-            async function data_stream() {
-                let num_1 = parseFloat(document.getElementById("test").value);
-                let num_2 = parseFloat(document.getElementById("test2").value);
-                document.getElementById("p1").innerHTML = 3;
-            };
-            document.getElementById("p1").innerHTML = "Calc";
+            getMenu("main");
+            const mainHead = document.getElementById("data_main");
+            mainHead.className = "active";
         </script>
 
 
