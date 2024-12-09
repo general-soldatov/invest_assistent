@@ -85,10 +85,47 @@ const menu = {
   },
 };
 
-class FormMaker {
-  constructor () {
 
-  }
-
-  transactions
+selectData = {
+  "engineer": "Инженер",
+  "scientist": "Учёный",
+  "psychologist": "Психолог",
+  "other": "Другая"
 }
+
+const formNew = new FormMaker("transaction");
+formNew.select("Профессия:", "specialization", selectData);
+formNew.generalInput("Почта:", "email", "email", "email", "elon@musk.com");
+formNew.generalInput("Pass:", "password", "password", "password");
+formNew.generalInput("Text:", "text", "text", "text");
+formNew.numberInput("Number:", "number", "num");
+formNew.checkbox("Data", "check");
+formNew.file("File", "file", "", "image/jpg");
+formNew.button("Report");
+formNew.integration(idName="formData");
+
+async function dataEventer (event) {
+  event.preventDefault();
+  // let text = document.createElement('a');
+  const elem = formNew.dataForm();
+  await eel.get_form(Array.from(elem))();
+  // Array.from(elem)
+  //   .forEach((elem) => {
+  //     eel.get_form(elem)()
+  // })
+  // document.body.appendChild(text);
+}
+
+formNew.form.addEventListener("submit", dataEventer);
+
+
+
+// class CashFlowRoot {
+//   constructor () {
+//     this.content = document.getElementById("content");
+//   }
+
+//   transactions () {
+
+//   }
+// }

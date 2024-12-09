@@ -51,5 +51,9 @@ def get_image():
     result['money_cb'] = data.graph_bytes()
     return result
 
+@eel.expose
+def get_form(data):
+    print(data)
+
 
 eel.start('templates/main_page.html', jinja_templates='templates')
