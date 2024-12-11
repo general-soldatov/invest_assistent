@@ -16,7 +16,7 @@ class FormMaker {
     }
 
     generalInput (labelName, nameInput, idInput,
-                  typeInput="text", placeInput="", elem=null) {
+                  {typeInput="text", placeInput="", elem=null}) {
       let label = document.createElement('label');
       label.textContent = labelName + " ";
       let input = document.createElement('input');
@@ -33,13 +33,15 @@ class FormMaker {
       }
     }
 
-    numberInput (labelName, nameInput, idInput, elem=null) {
+    numberInput (labelName, nameInput, idInput, {step=1, value=0, elem=null}) {
       let label = document.createElement('label');
       label.textContent = labelName + " ";
       let input = document.createElement('input');
       input.name = nameInput;
       input.id = idInput;
+      input.value = value;
       input.type = "number";
+      input.step = step;
       label.appendChild(input);
       if (elem) {
         elem.appendChild(label);
@@ -107,7 +109,7 @@ class FormMaker {
     button (nameButton, funcButton=null, elem=null) {
       let button = document.createElement('input');
       button.type = "submit";
-      button.textContent = nameButton;
+      button.value = nameButton;
       if (funcButton) {
         button.addEventListener("click", funcButton);
       }

@@ -4,7 +4,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 from database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns, NominalPaper, BondInfo
 from typing import List, Dict
-from moex_parser import InfoPaper
+from models.moex_parser import InfoPaper
 from datetime import datetime
 # from models.table_parse import ParseTable
 
@@ -158,6 +158,11 @@ class MainPage:
                 data_year[item.date_operation.year] += item.sum_enroll
         return data_year #, sum(data_year.values())
 
+    def get_papers(self):
+        data: List[str] = self.Session().query(SecurityDirectory.code_paper,
+                                               SecurityDirectory.name_paper).all()
+        return {item[0]: item[1] for item in sorted(data, key=lambda x: x[1])}
+
 
 
 def add_data(Session: sessionmaker):
@@ -227,7 +232,8 @@ def main():
     # data = MainPage().get_bonds()
     # data = MainPage().get_bonds_sql()
     # print(InfoPaper().get_price_paper(['RU000A1058K7']))
-    data = MainPage().get_cash('write-down')
+    # data = MainPage().get_cash('write-down')
+    data = MainPage().get_papers()
     print(data)
     # data = [{'security_id': 'SU26243RMFS4', 'name_paper': 'ОФЗ 26243', 'nominal': 1000, 'coupon_value': 48.87, 'nkd': 46.99, 'next_coupon_date': '2024-12-04', 'maturity_date': '2038-05-19', 'coupon_period': 182, 'coupon_enroll': '9.774 %'}]
     # DBManager(Session, file_path='stack_data/400PJLR_010121_310121_M.html').add_bond_info(data)

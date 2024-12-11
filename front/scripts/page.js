@@ -65,12 +65,12 @@ const menu = {
       },
       'Добавить доход': async function() {
         await getForm("enroll");
-        // data_coupon = await eel.brief_case()();
-        // getEnrollments(data_coupon[0], data_coupon[1], tableName="briefcase");
       },
       'Добавить вывод со счёта': async function() {
-        data_coupon = await eel.brief_case()();
-        getEnrollments(data_coupon[0], data_coupon[1], tableName="briefcase");
+        await getForm("write-down");
+      },
+      'Анализ отчёта брокера': async function() {
+        await getForm("report");
       },
   },
   "menu": {
@@ -91,9 +91,10 @@ async function getForm(nameForm = "transaction") {
   async function transactPy (event) {
     event.preventDefault();
     const elem = formTransaction.dataForm();
-    await eel.get_transaction(Array.from(elem))();
+    await eel.get_transaction(Array.from(elem), nameForm)();
+    alert("Информация успешно добавлена!");
   }
-  const formTransaction = new TransactionForm (nameForm);
+  const formTransaction = new TransactionForm(nameForm);
 
   if (nameForm == "transaction") {
     formTransaction.addTransaction();
@@ -101,31 +102,68 @@ async function getForm(nameForm = "transaction") {
   else if (nameForm == "enroll") {
     formTransaction.addEnroll();
   }
+  else if (nameForm == "write-down") {
+    formTransaction.addDownCash();
+  }
+  else if (nameForm == "report") {
+    formTransaction.addReport();
+  }
   formTransaction.form.addEventListener("submit", transactPy);
 }
 
+type_operation = {
+  "purchase": "Покупка",
+  "sales": "Продажа"
+}
 
+enroll = {
+  'coupon': 'купон',
+  'depreciation': 'амортизация',
+  'repayment': 'погашение',
+  'dividends': 'дивиденды'
+}
 
-selectData = {
-  "engineer": "Инженер",
-  "scientist": "Учёный",
-  "psychologist": "Психолог",
-  "other": "Другая"
+downCash = {
+  'Списание д/с': 'Списание д/с'
 }
 
 class TransactionForm extends FormMaker {
 
-  addTransaction () {
-    this.select("Профессия:", "specialization", selectData);
-    this.generalInput("Почта:", "email", "email", "email", "elon@musk.com");
-    this.button("Report");
+  async addTransaction () {
+    this.select("Тип сделки:", "type_deal", type_operation);
+    const papers = await eel.get_papers()();
+    this.select("Бумага:", "name_paper", papers);
+    this.generalInput("Дата:", "date_deal", "date", {typeInput: "date"});
+    this.numberInput("Количество", "count_paper", "count_paper", {step: 1});
+    this.numberInput("Цена, руб:", "price_paper", "price_paper", {step: 0.01});
+    this.numberInput("НКД, руб:", "coupon_add_paper", "coupon_add_paper", {step: 0.01});
+    this.numberInput("Комиссия брокера, %:", "broker_comission", "broker_comission", {step: 0.01, value: 0.03});
+    this.numberInput("Комиссия биржи, %:", "market_comission", "market_comission", {step: 0.001, value: 0.014});
+    this.button("Добавить сделку");
     this.integration(idName="content");
   }
 
-  addEnroll () {
-    this.select("Профессия:", "specialization", selectData);
-    this.generalInput("Почта:", "email", "email", "email", "elon@musk.com");
-    this.button("Report");
+  async addEnroll () {
+    this.select("Тип дохода:", "type_operation", enroll);
+    const papers = await eel.get_papers()();
+    this.select("Бумага:    ", "name_paper", papers);
+    this.generalInput("Дата:      ", "date_operation", "date", {typeInput:"date"});
+    this.numberInput("Сумма:     ", "sum_enroll", "sum_enroll", {step: 0.01});
+    this.button("Добавить доход");
+    this.integration(idName="content");
+  }
+
+  addDownCash () {
+    this.select("Тип списания:", "operation", downCash);
+    this.generalInput("Дата:", "date_operation", "date", {typeInput:"date"});
+    this.numberInput("Сумма:", "sum_enroll", "sum_enroll", {step: 0.01});
+    this.button("Добавить операцию");
+    this.integration(idName="content");
+  }
+
+  addReport () {
+    this.file("Отчёт брокера: ", "file", "file_input", ".html");
+    this.button("Анализ отчёта");
     this.integration(idName="content");
   }
 
@@ -144,28 +182,28 @@ const formNew = new FormMaker("transaction");
 // formNew.button("Report");
 formNew.integration(idName="formData");
 
-async function dataEventer (event) {
-  event.preventDefault();
-  // let text = document.createElement('a');
-  const elem = formNew.dataForm();
-  console.log(Array.from(elem.entries()));
-  const filesData = document.getElementById("file_input").files[0];
-  const reader = new FileReader();
-  reader.readAsArrayBuffer(filesData);
-  reader.onload = () => {
-        const arrayBuffer = reader.result;
-        const uint8Array = new Uint8Array(arrayBuffer);
-        const base64String = btoa(String.fromCharCode(...uint8Array));
-        eel.get_form(Array.from(elem), base64String)();
-    }
-  console.log(filesData);
+// async function dataEventer (event) {
+//   event.preventDefault();
+//   // let text = document.createElement('a');
+//   const elem = formNew.dataForm();
+//   console.log(Array.from(elem.entries()));
+//   const filesData = document.getElementById("file_input").files[0];
+//   const reader = new FileReader();
+//   reader.readAsArrayBuffer(filesData);
+//   reader.onload = () => {
+//         const arrayBuffer = reader.result;
+//         const uint8Array = new Uint8Array(arrayBuffer);
+//         const base64String = btoa(String.fromCharCode(...uint8Array));
+//         eel.get_form(Array.from(elem), base64String)();
+//     }
+//   console.log(filesData);
 
   // Array.from(elem)
   //   .forEach((elem) => {
   //     eel.get_form(elem)()
   // })
   // document.body.appendChild(text);
-}
+// }
 
 // formNew.form.addEventListener("submit", dataEventer);
 

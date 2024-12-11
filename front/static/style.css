@@ -55,6 +55,64 @@ body {
               border-collapse: collapse;
           }
 
+/* form {
+  font-size:16px;
+  padding:4px 2px;
+  width:50%;
+  margin:2px 0 20px 10px;
+} */
+
+label {
+  display: block;
+  margin-bottom: 25px;
+  font-weight: bold;
+
+}
+
+input {
+  width: 210px;
+}
+
+input:focus {
+  outline: none;
+  box-shadow: 0 0 3px #66afe9;
+}
+
+form select {
+  width: 210px;
+  margin: 0px 10px;
+}
+
+select:focus {
+  outline: none;
+  box-shadow: 0 0 5px #66afe9;
+/*   border: 5px; */
+}
+
+input[type="submit"] {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  background-image: linear-gradient(to right, #4CAF50, #17851a);
+  color: white;
+  text-transform: uppercase;
+  transition: background-color 0.25s;
+}
+
+input[type="submit"]:hover {
+  background-image: linear-gradient(to right, #17851a, #4CAF50);
+}
+
+input[type="submit"]:active {
+  background-color: #012402;
+  /* background-image: linear-gradient(to right, #17851a, #4CAF50); */
+}
+
+#file_input {
+  width: 90%;
+  margin-top: 15px;
+}
+
 /* Стилистика вкладок */
 .menu {
   float: left;

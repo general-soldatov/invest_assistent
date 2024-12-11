@@ -90,6 +90,8 @@ class DBManager:
         return self.Session().scalars(query)
 
 
+
+
 # def create_user(Session: sessionmaker, id_, name, email):
 #     user = User(id_=id_, name=name, e_mail=email)
 
