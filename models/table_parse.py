@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import json
-from models.report import Transactions, Enrollments, WriteDowns, SecurityDirectory, MyCash, NominalPaper
+from database.report import Transactions, Enrollments, WriteDowns, SecurityDirectory, MyCash, NominalPaper
 from datetime import datetime
 from typing import List
 import logging

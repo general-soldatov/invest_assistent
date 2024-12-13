@@ -1,10 +1,11 @@
 import logging
-from sqlalchemy import select
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import NoResultFound, IntegrityError
 import sqlite3
 
-from models.report import Base, Transactions, SecurityDirectory, Enrollments, WriteDowns, MyCash, NominalPaper, BondInfo
+from database.report import DBManageCreator, Base, Transactions, SecurityDirectory, \
+                    Enrollments, WriteDowns, MyCash, NominalPaper, BondInfo
 from models.table_parse import ParseTable
 from typing import List
 from dotenv import load_dotenv
@@ -13,9 +14,12 @@ from os import getenv
 logger = logging.getLogger(__name__)
 
 
-class DBManager:
-    def __init__(self, Session: sessionmaker, file_path: str):
-        self.Session: sessionmaker = Session
+class DBManager(DBManageCreator):
+    def __init__(self, Session: sessionmaker = None, file_path: str=''):
+        if Session:
+            self.Session: sessionmaker = Session
+        else:
+            super().__init__()
         self.parse = ParseTable(file_path)
         self.parse.parsing()
 

@@ -1,7 +1,11 @@
-# from pydantic import BaseModel
 from datetime import date
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import BigInteger
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
+from sqlalchemy import BigInteger, create_engine
+
+class DBManageCreator:
+    def __init__(self):
+        engine = create_engine('sqlite:///my-database.db')
+        self.Session: sessionmaker = sessionmaker(engine)
 
 class Base(DeclarativeBase):
     pass

@@ -2,6 +2,8 @@ function isFloat(n){
     return Number(n) === n && n % 1 !== 0;
   };
 
+const zip = (a, b) => a.map((k, i) => [k, b[i]]);
+
 class Dashboard {
     constructor() {
       this.dashboard = {
@@ -53,13 +55,14 @@ class Dashboard {
   };
 
 
-async function getEnrollments(dataDB=[], cash=0, tableName = 'coupons', section="reports") {
+async function getEnrollments(dataDB=[], cash=0, tableName = 'coupons', section="reports", resetText=true) {
     const dataJSON = await eel.import_table(section, tableName)();
     const vision = document.getElementById("content");
-    vision.innerHTML = '';
+    if (resetText) {
+      vision.innerHTML = '';
+    }
     let table = document.createElement("table");
     table.style = "width:100%";
-    vision.appendChild(table);
     let tr = document.createElement("tr");
     table.appendChild(tr);
     for (const key in dataJSON.head) {
@@ -89,6 +92,7 @@ async function getEnrollments(dataDB=[], cash=0, tableName = 'coupons', section=
       cash_tr.innerHTML = `${"<th></th>".repeat(dataJSON.keys.length - 2)}<th>Summary</th><th>${cash}</th>`;
       table.appendChild(cash_tr);
     }
+    vision.appendChild(table);
 
 };
 

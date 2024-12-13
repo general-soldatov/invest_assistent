@@ -2,9 +2,11 @@ from os import listdir
 from os.path import isfile, join
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
-from database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns, NominalPaper, BondInfo
+from database.database import DBManager, Base, Transactions, SecurityDirectory, Enrollments, MyCash, WriteDowns, NominalPaper, BondInfo
 from typing import List, Dict
+
 from models.moex_parser import InfoPaper
+from database.report import DBManageCreator
 from datetime import datetime
 # from models.table_parse import ParseTable
 
@@ -18,10 +20,10 @@ def future_value_enroll(nominal: int, count: int,
     return coef_relative * yearDay / day_to * 100
 
 
-class MainPage:
-    def __init__(self):
-        engine = create_engine('sqlite:///my-database.db')
-        self.Session: sessionmaker = sessionmaker(engine)
+class MainPage(DBManageCreator):
+    # def __init__(self):
+    #     engine = create_engine('sqlite:///my-database.db')
+    #     self.Session: sessionmaker = sessionmaker(engine)
 
     def enrollments(self, types):
         condition = Enrollments.type_operation == types if types else Enrollments.type_operation != 'купон'

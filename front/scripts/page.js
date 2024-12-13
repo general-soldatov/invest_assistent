@@ -87,12 +87,42 @@ const menu = {
   },
 };
 
+async function dataTableReport(lstData) {
+  const nameTables = {
+    "cash-flow": "Денежный поток за период",
+    "delay-data": "Сделки купли/продажи",
+    "security": "Справочник бумаг"
+  };
+  const vision = document.getElementById("content");
+  for (item of zip(Object.keys(nameTables), lstData)) {
+    const nameTable = document.createElement('p');
+    nameTable.textContent = nameTables[item[0]];
+    vision.appendChild(nameTable);
+    await getEnrollments(item[1], 0, item[0], "parse", false);
+  }
+}
+
 async function getForm(nameForm = "transaction") {
   async function transactPy (event) {
     event.preventDefault();
     const elem = formTransaction.dataForm();
-    await eel.get_transaction(Array.from(elem), nameForm)();
-    alert("Информация успешно добавлена!");
+    if (nameForm == "report") {
+      const reader = new FileReader();
+      const inputFile = elem.get('file');
+      reader.readAsText(inputFile);
+      const content = document.getElementById('content');
+      reader.onload = () => {
+            let lst = eel.get_transaction(reader.result, nameForm)();
+            lst.then(
+              result => dataTableReport(result), // Данные загружены
+              error => console.log(error) // Выполнено не будет
+            )
+        }
+    }
+    else {
+      await eel.get_transaction(Array.from(elem), nameForm)();
+      alert("Информация успешно добавлена!");
+    }
   }
   const formTransaction = new TransactionForm(nameForm);
 

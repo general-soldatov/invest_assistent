@@ -15,7 +15,21 @@
         "briefcase": {
           "head": {"Облигация": 15, "Расходы": 10, "Приход": 10, "Купон": 10, "Количество": 10, "Цена": 10, "Сумма": 15, "Доходность": 10, "Купонная доходность": 10},
           "keys": ["name_paper", "credit", "debet", "coupons", "count", "price", "sum", "fv_enroll", "day_to"]
-      }
+        }
+      },
+      "parse": {
+        "cash-flow": {
+          "head": {"Код операции": 15, "Операция": 45, "Дата операции": 20, "Сумма": 20},
+          "keys": ["id_hash", "operation", "date_operation", "sum_enroll"]
+        },
+        "delay-data": {
+          "head": {"№ сделки": 15, "Название бумаги": 10, "Дата": 10, "Тип сделки": 10, "Количество": 10, "Цена": 10, "НКД": 15, "Комиссия брокера": 10, "Комиссия биржи": 10},
+          "keys": ["id_deal", "name_paper", "date_deal", "type_deal", "count_paper", "price_paper", "coupon_add_paper", "broker_comission", "market_comission"]
+        },
+        "security": {
+          "head": {"Название бумаги": 15, "Код": 10, "ISIN": 10, "Эмитент": 45, "Тип": 10, "Серия": 10},
+          "keys": ["name_paper", "code_paper", "isin_paper", "emitent", "type_paper", "series_paper"]
+        }
       }
 
 }

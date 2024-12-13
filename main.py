@@ -1,6 +1,7 @@
 import eel
 import json
 from mail_parse import MainPage
+from database.db_forms import FormParseReport, DBForm
 import base64
 # from models.graph_plots import graph_bytes
 from models.graph_plots import ByteGraph
@@ -53,13 +54,18 @@ def get_image():
 
 @eel.expose
 def get_transaction(data, name):
-    print(data)
+    if name == 'report':
+        report = DBForm(data)
+        lst = report()
+        return lst
     print(name)
+    for key, value in data:
+        print(key, value)
 
 @eel.expose
 def get_form(data, file):
     print(data)
-    with open('photo.jpg', 'wb') as fls:
+    with open('report.html', 'wb') as fls:
         fls.write(base64.b64decode(file))
 
 @eel.expose
